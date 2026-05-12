@@ -1,0 +1,54 @@
+/* =========================================================
+   Skin: Skate VHS
+   Faded magenta/teal, cassette-tape vibes, soft fuzz.
+   ========================================================= */
+body.skin-vhs {
+  --font-ui:   "Trebuchet MS", "Verdana", sans-serif;
+  --font-lcd:  "Courier New", monospace;
+
+  --desk:      #1a1410;
+  --desk-bg:
+      repeating-linear-gradient(
+        180deg,
+        rgba(255,255,255,.025) 0 2px, transparent 2px 4px
+      ),
+      radial-gradient(circle at 50% 50%, rgba(255,90,200,.12), transparent 60%),
+      linear-gradient(180deg, #2a1c14, #0e0a08);
+
+  --fg:        #ffe6c4;
+  --accent:    #ff6ec7;
+  --glow:      rgba(255,110,200,.25);
+
+  --win-bg:    #2a1f17;
+  --win-border:#8a4a2a;
+  --win-inner: #1c130d;
+
+  --title-bg:  linear-gradient(#3a2a1c, #1c130d);
+  --title-fg:  #ffd1e0;
+
+  --btn-bg:    #1c130d;
+  --btn-fg:    #ffe6c4;
+
+  --lcd-bg:    #100604;
+  --lcd-border:#8a4a2a;
+  --lcd-fg:    #ffb86c;
+
+  --input-bg:  #100604;
+  --list-bg:   #100604;
+  --list-row:  #1c130d;
+  --list-hover:#3a2a1c;
+  --track:     #3a2a1c;
+
+  --vis-bg:    #0e0805;
+  --vis-fg:    #ff6ec7;
+  --vis-fg2:   #6ee7ff;
+  --vis-fg3:   #ffb86c;
+}
+
+/* Soft VHS fuzz over windows */
+body.skin-vhs .win {
+  filter: contrast(1.02) saturate(1.1);
+}
+body.skin-vhs .lcd {
+  text-shadow: 0 0 4px #ff6ec7, 0 0 2px #6ee7ff;
+}

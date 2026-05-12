@@ -1,0 +1,44 @@
+/* =========================================================
+   Skin: Classic Green LCD
+   The default Winamp-meets-handheld-LCD look.
+   ========================================================= */
+body.skin-classic {
+  --font-ui:   "Lucida Console", "Courier New", monospace;
+  --font-lcd:  "Courier New", monospace;
+
+  --desk:      #0a120a;
+  --desk-bg:
+      radial-gradient(circle at 25% 30%, rgba(0,255,80,.08), transparent 50%),
+      radial-gradient(circle at 75% 70%, rgba(0,255,80,.06), transparent 50%),
+      linear-gradient(180deg, #0a120a, #050a05);
+
+  --fg:        #b9ffb9;
+  --accent:    #5bff5b;
+  --glow:      rgba(0,255,80,.25);
+
+  --win-bg:    #1a221a;
+  --win-border:#244c24;
+  --win-inner: #0e160e;
+
+  --title-bg:  linear-gradient(#1f2e1f, #0a120a);
+  --title-fg:  #9fff9f;
+
+  --btn-bg:    #0e160e;
+  --btn-fg:    #b9ffb9;
+
+  --lcd-bg:    #001500;
+  --lcd-border:#003400;
+  --lcd-fg:    #5bff5b;
+
+  --input-bg:  #000;
+  --list-bg:   #000;
+  --list-row:  #061a06;
+  --list-hover:#002400;
+  --track:     #0e2a0e;
+
+  /* visualizer palette consumed by visualizers/index.js */
+  --vis-bg:    #000000;
+  --vis-fg:    #5bff5b;
+  --vis-fg2:   #00ff66;
+  --vis-fg3:   #ffffff;
+}

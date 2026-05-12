@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>WINAMP-YT // It really whips the YouTube's videos</title>
+
+<link rel="stylesheet" href="css/main.css" />
+<link rel="stylesheet" href="css/skins/classic.css" />
+<link rel="stylesheet" href="css/skins/y2k.css" />
+<link rel="stylesheet" href="css/skins/vhs.css" />
+</head>
+<body class="skin-classic">
+
+<!-- ============================================================
+     HIDDEN YouTube IFrame container.
+     The YouTube IFrame Player API replaces this <div> with an
+     <iframe> at runtime. We keep it hidden because we use our own
+     UI, but it must remain in the DOM (and be at least 1px) for
+     YouTube to deliver audio reliably.
+============================================================ -->
+<div id="yt-host-wrap" aria-hidden="true">
+  <div id="yt-host"></div>
+</div>
+
+<!-- ============================================================
+     CRT / Glitch / Rave overlays (full screen post effects)
+============================================================ -->
+<div id="fx-crt"     class="fx-layer"></div>
+<div id="fx-glitch"  class="fx-layer"></div>
+<div id="fx-rave"    class="fx-layer"></div>
+<div id="fx-flash"   class="fx-layer"></div>
+
+<!-- Fake boot screen -->
+<div id="boot-screen">
+  <pre id="boot-text"></pre>
+</div>
+
+<!-- ============================================================
+     DESKTOP - all windows live here so we can drag them around
+============================================================ -->
+<div id="desktop">
+
+  <!-- ============= MAIN PLAYER WINDOW ============= -->
+  <section class="win win-main" id="win-main" data-window="main">
+    <header class="titlebar" data-drag-handle>
+      <span class="title">WINAMP-YT</span>
+      <span class="title-blink">*</span>
+      <div class="title-buttons">
+        <button class="tb compact"  title="Compact"     data-action="toggle-compact">_</button>
+        <button class="tb mini"     title="Minimize"    data-action="minimize">–</button>
+        <button class="tb close"    title="Close"       data-action="close">x</button>
+      </div>
+    </header>
+
+    <div class="main-body">
+      <!-- LCD readout -->
+      <div class="lcd">
+        <div class="lcd-row top">
+          <span class="lcd-time" id="lcd-time">--:--</span>
+          <span class="lcd-bitrate"><b id="lcd-bitrate">128</b> kbps</span>
+          <span class="lcd-khz"><b id="lcd-khz">44</b> kHz</span>
+          <span class="lcd-stereo" id="lcd-stereo">stereo</span>
+        </div>
+        <div class="lcd-row marquee">
+          <div class="marquee-track" id="marquee-track">
+            <span id="marquee-text">★ no playlist loaded — paste a YouTube playlist URL or ID below ★</span>
+          </div>
+        </div>
+        <!-- mini inline spectrum -->
+        <canvas id="lcd-vis" width="76" height="16"></canvas>
+      </div>
+
+      <!-- Transport -->
+      <div class="transport">
+        <button class="btn prev"    data-action="prev"    title="Previous (Z)">⏮</button>
+        <button class="btn play"    data-action="play"    title="Play (X)">▶</button>
+        <button class="btn pause"   data-action="pause"   title="Pause (C)">❚❚</button>
+        <button class="btn stop"    data-action="stop"    title="Stop (V)">■</button>
+        <button class="btn next"    data-action="next"    title="Next (B)">⏭</button>
+        <button class="btn open"    data-action="open"    title="Open Playlist (L)">⏏</button>
+      </div>
+
+      <!-- shuffle / repeat / mode -->
+      <div class="modes">
+        <button class="mode shuffle" data-action="toggle-shuffle" title="Shuffle (S)">SHUF</button>
+        <button class="mode repeat"  data-action="toggle-repeat"  title="Repeat (R)">REP</button>
+        <button class="mode eq"      data-action="toggle-window"  data-target="eq"       title="EQ">EQ</button>
+        <button class="mode pl"      data-action="toggle-window"  data-target="playlist" title="Playlist (P)">PL</button>
+        <button class="mode vis"     data-action="toggle-window"  data-target="vis"      title="Visualizer (V)">VIS</button>
+        <button class="mode radio"   data-action="toggle-radio"   title="Internet Radio">RAD</button>
+      </div>
+
+      <!-- Sliders -->
+      <div class="sliders">
+        <label class="vol">
+          <span>VOL</span>
+          <input type="range" id="volume" min="0" max="100" value="80" />
+        </label>
+        <label class="bal">
+          <span>BAL</span>
+          <input type="range" id="balance" min="-50" max="50" value="0" />
+        </label>
+        <button class="mute" id="mute" data-action="mute" title="Mute (M)">🔊</button>
+      </div>
+
+      <!-- Seek -->
+      <div class="seekwrap">
+        <input type="range" id="seek" min="0" max="1000" value="0" />
+        <span class="seek-time" id="seek-time">00:00 / 00:00</span>
+      </div>
+
+      <!-- Skin picker -->
+      <div class="skinpicker">
+        <label>SKIN</label>
+        <select id="skin-select">
+          <option value="classic">Classic Green LCD</option>
+          <option value="y2k">Y2K Hacker</option>
+          <option value="vhs">Skate VHS</option>
+        </select>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============= PLAYLIST WINDOW ============= -->
+  <section class="win win-playlist" id="win-playlist" data-window="playlist">
+    <header class="titlebar" data-drag-handle>
+      <span class="title">PLAYLIST EDITOR</span>
+      <div class="title-buttons">
+        <button class="tb mini"  data-action="minimize">–</button>
+        <button class="tb close" data-action="close">x</button>
+      </div>
+    </header>
+
+    <div class="pl-body">
+      <div class="pl-loader">
+        <input type="text" id="pl-input"
+               placeholder="YouTube playlist URL or ID  (e.g. PLxxxxxxxxxxxx)"
+               spellcheck="false" />
+        <button id="pl-load">LOAD</button>
+        <button id="pl-clear" title="Clear playlist">CLR</button>
+      </div>
+
+      <ol id="pl-list" class="pl-list"></ol>
+
+      <footer class="pl-foot">
+        <span id="pl-count">0 tracks</span>
+        <span class="spacer"></span>
+        <span id="pl-total-time">00:00</span>
+      </footer>
+    </div>
+  </section>
+
+  <!-- ============= EQUALIZER WINDOW ============= -->
+  <section class="win win-eq" id="win-eq" data-window="eq">
+    <header class="titlebar" data-drag-handle>
+      <span class="title">EQUALIZER</span>
+      <div class="title-buttons">
+        <button class="tb mini"  data-action="minimize">–</button>
+        <button class="tb close" data-action="close">x</button>
+      </div>
+    </header>
+    <div class="eq-body">
+      <div class="eq-top">
+        <button class="eq-on toggle"  id="eq-on">ON</button>
+        <button class="eq-auto toggle" id="eq-auto">AUTO</button>
+        <select id="eq-preset">
+          <option>Flat</option>
+          <option>Rock</option>
+          <option>Hip-Hop</option>
+          <option>Punk</option>
+          <option>Bass Boost</option>
+          <option>Treble Boost</option>
+          <option>Vocal</option>
+          <option>Dance</option>
+        </select>
+        <button class="eq-bass" id="eq-bass">BASS+</button>
+      </div>
+
+      <div class="eq-sliders">
+        <div class="eq-band preamp">
+          <input type="range" min="-12" max="12" value="0" data-band="pre" />
+          <span>PRE</span>
+        </div>
+        <div class="eq-band" data-band="0"><input type="range" min="-12" max="12" value="0"/><span>60</span></div>
+        <div class="eq-band" data-band="1"><input type="range" min="-12" max="12" value="0"/><span>170</span></div>
+        <div class="eq-band" data-band="2"><input type="range" min="-12" max="12" value="0"/><span>310</span></div>
+        <div class="eq-band" data-band="3"><input type="range" min="-12" max="12" value="0"/><span>600</span></div>
+        <div class="eq-band" data-band="4"><input type="range" min="-12" max="12" value="0"/><span>1k</span></div>
+        <div class="eq-band" data-band="5"><input type="range" min="-12" max="12" value="0"/><span>3k</span></div>
+        <div class="eq-band" data-band="6"><input type="range" min="-12" max="12" value="0"/><span>6k</span></div>
+        <div class="eq-band" data-band="7"><input type="range" min="-12" max="12" value="0"/><span>12k</span></div>
+        <div class="eq-band" data-band="8"><input type="range" min="-12" max="12" value="0"/><span>14k</span></div>
+        <div class="eq-band" data-band="9"><input type="range" min="-12" max="12" value="0"/><span>16k</span></div>
+      </div>
+
+      <canvas id="eq-curve" width="260" height="48"></canvas>
+    </div>
+  </section>
+
+  <!-- ============= VISUALIZER WINDOW ============= -->
+  <section class="win win-vis" id="win-vis" data-window="vis">
+    <header class="titlebar" data-drag-handle>
+      <span class="title">VISUALIZER</span>
+      <div class="title-buttons">
+        <button class="tb mini"  data-action="minimize">–</button>
+        <button class="tb close" data-action="close">x</button>
+      </div>
+    </header>
+    <div class="vis-body">
+      <canvas id="vis-canvas" width="480" height="280"></canvas>
+      <div class="vis-controls">
+        <button id="vis-prev" title="Previous preset (← / [)">◀</button>
+        <select id="vis-select"></select>
+        <button id="vis-next"   title="Next preset (→ / ])">▶</button>
+        <button id="vis-full"   title="Fullscreen (F)">⛶</button>
+        <button id="vis-rave"   title="Rave mode">RAVE</button>
+        <button id="vis-insane" title="Insane mode — intensity rises forever">INSANE</button>
+        <button id="vis-save"   title="Save current as preset">SAVE</button>
+        <select id="vis-userpresets" title="User presets"></select>
+      </div>
+    </div>
+  </section>
+
+</div><!-- /#desktop -->
+
+<!-- DJ text overlay (between songs / on radio) -->
+<div id="dj-bubble"></div>
+
+<!-- Toast for hidden codes & easter eggs -->
+<div id="toast"></div>
+
+<!-- ============================================================
+     SCRIPTS - loaded as plain scripts (no module system needed
+     for "open index.html in a browser" usage). Order matters:
+     util > storage > skins > effects > audio-sim > visualizers >
+     player > playlist > equalizer > ui > app
+============================================================ -->
+<script src="js/util.js"></script>
+<script src="js/storage.js"></script>
+<script src="js/skins.js"></script>
+<script src="js/effects.js"></script>
+<script src="js/audio-sim.js"></script>
+
+<script src="js/visualizers/spectrum.js"></script>
+<script src="js/visualizers/oscilloscope.js"></script>
+<script src="js/visualizers/vumeter.js"></script>
+<script src="js/visualizers/tunnel.js"></script>
+<script src="js/visualizers/particles.js"></script>
+<script src="js/visualizers/waveformTunnel.js"></script>
+<script src="js/visualizers/milkdrop.js"></script>
+<script src="js/visualizers/index.js"></script>
+
+<script src="js/player.js"></script>
+<script src="js/playlist.js"></script>
+<script src="js/equalizer.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/app.js"></script>
+
+<!-- YouTube IFrame API (loaded last so window.onYouTubeIframeAPIReady is defined) -->
+<script src="https://www.youtube.com/iframe_api"></script>
+
+</body>
+</html>
