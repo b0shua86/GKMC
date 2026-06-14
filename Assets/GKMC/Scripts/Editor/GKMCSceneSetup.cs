@@ -25,7 +25,7 @@ namespace GKMC.EditorTools
         [MenuItem("GKMC/Add Tour To Open Scene", false, 1)]
         public static void AddToScene()
         {
-            if (Object.FindFirstObjectByType<GKMCExperience>() != null)
+            if (Object.FindAnyObjectByType<GKMCExperience>() != null)
             {
                 EditorUtility.DisplayDialog("GKMC", "This scene already has a GKMC_Experience.", "OK");
                 return;

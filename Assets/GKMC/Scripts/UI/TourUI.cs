@@ -47,9 +47,9 @@ namespace GKMC
             // Top-left info card.
             var card = Panel(root, "InfoCard", new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0f, 1f),
                 new Vector2(30f, -30f), new Vector2(620f, 250f), new Color(0f, 0f, 0f, 0.45f));
-            _trackText = MakeLabel(card, "Track", 34, TextAnchor.UpperLeft, Color.white,
+            _trackText = MakeLabel(card.transform, "Track", 34, TextAnchor.UpperLeft, Color.white,
                 new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0.5f, 1f), new Vector2(16f, -14f), new Vector2(-32f, 90f));
-            _blurbText = MakeLabel(card, "Blurb", 20, TextAnchor.UpperLeft, new Color(0.9f, 0.9f, 0.92f),
+            _blurbText = MakeLabel(card.transform, "Blurb", 20, TextAnchor.UpperLeft, new Color(0.9f, 0.9f, 0.92f),
                 new Vector2(0f, 0f), new Vector2(1f, 1f), new Vector2(0.5f, 1f), new Vector2(16f, -108f), new Vector2(-32f, 120f));
 
             // Audio / YouTube status (under the card).

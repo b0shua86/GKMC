@@ -37,7 +37,7 @@ namespace GKMC
         static void AutoBoot()
         {
             if (DisableAutoBoot) return;
-            if (FindFirstObjectByType<GKMCExperience>() != null) return;
+            if (FindAnyObjectByType<GKMCExperience>() != null) return;
             var go = new GameObject("GKMC_Experience");
             go.AddComponent<GKMCExperience>();
         }
@@ -54,8 +54,8 @@ namespace GKMC
             ModelLibrary.ModelsEnabled = useModels;
 
             // Make our player the only active camera / listener in the scene.
-            foreach (var cam in FindObjectsByType<Camera>(FindObjectsSortMode.None)) cam.enabled = false;
-            foreach (var al in FindObjectsByType<AudioListener>(FindObjectsSortMode.None)) al.enabled = false;
+            foreach (var cam in FindObjectsByType<Camera>(FindObjectsInactive.Include)) cam.enabled = false;
+            foreach (var al in FindObjectsByType<AudioListener>(FindObjectsInactive.Include)) al.enabled = false;
 
             _tracks = AlbumData.BuildTracks();
 
