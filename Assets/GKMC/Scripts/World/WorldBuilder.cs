@@ -249,6 +249,10 @@ namespace GKMC
                 GKMCUtil.Box(w, "GraffitiWall", new Vector3(12f * s, 3f, -4f), new Vector3(0.4f, 6f, 14f), GKMCUtil.Mat(new Color(0.1f, 0.05f, 0.05f)));
                 GKMCUtil.Box(w, "Tag", new Vector3(11.7f * s, 3f, -4f), new Vector3(0.1f, 2.5f, 8f), accent, false);
             }
+            // Personal spray-paint tag on the left wall.
+            GKMCUtil.Sign(w, "GraffitiBosh", new Vector3(-11.55f, 3.5f, -4f), "BOSH\nWAS HERE",
+                new Color(0.3f, 1f, 0.45f), 0.9f, new Vector3(0f, 90f, 6f));
+            GKMCUtil.PointLight(w, "TagGlow", new Vector3(-9f, 3.5f, -4f), new Color(0.3f, 1f, 0.45f), 1.4f, 9f);
             for (int i = 0; i < 40; i++)
                 GKMCUtil.Box(w, "Glass", new Vector3(Random.Range(-13f, 13f), 0.05f, Random.Range(-20f, 20f)),
                     Vector3.one * Random.Range(0.05f, 0.18f), GKMCUtil.MatEmissive(new Color(1f, 0.6f, 0.4f), new Color(1f, 0.4f, 0.2f), 0.6f),
