@@ -1,0 +1,18 @@
+{
+  "_comment": "Copy this file to 'gkmc_tracks.json' (same folder) to override audio links/files without recompiling. Fill youtubeId for stream-resolver playback, or youtubeUrl just to show the right link on screen. Leave fields blank to keep defaults.",
+  "streamResolverTemplate": "",
+  "tracks": [
+    { "number": 1,  "youtubeId": "", "youtubeUrl": "", "audioFile": "01.ogg" },
+    { "number": 2,  "youtubeId": "", "youtubeUrl": "", "audioFile": "02.ogg" },
+    { "number": 3,  "youtubeId": "", "youtubeUrl": "", "audioFile": "03.ogg" },
+    { "number": 4,  "youtubeId": "", "youtubeUrl": "", "audioFile": "04.ogg" },
+    { "number": 5,  "youtubeId": "", "youtubeUrl": "", "audioFile": "05.ogg" },
+    { "number": 6,  "youtubeId": "", "youtubeUrl": "", "audioFile": "06.ogg" },
+    { "number": 7,  "youtubeId": "", "youtubeUrl": "", "audioFile": "07.ogg" },
+    { "number": 8,  "youtubeId": "", "youtubeUrl": "", "audioFile": "08.ogg" },
+    { "number": 9,  "youtubeId": "", "youtubeUrl": "", "audioFile": "09.ogg" },
+    { "number": 10, "youtubeId": "", "youtubeUrl": "", "audioFile": "10.ogg" },
+    { "number": 11, "youtubeId": "", "youtubeUrl": "", "audioFile": "11.ogg" },
+    { "number": 12, "youtubeId": "", "youtubeUrl": "", "audioFile": "12.ogg" }
+  ]
+}

@@ -1,0 +1,43 @@
+# Unity generated / transient
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+[Mm]emoryCaptures/
+
+# Visual Studio / Rider / IDE
+.vs/
+.idea/
+.vscode/
+*.csproj
+*.sln
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.suo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+*.apk
+*.aab
+*.app
+*.unitypackage
+
+# Crash reports
+sysinfo.txt
+*.stackdump
+
+# Local secrets (never commit API keys)
+meshy.key
+*.key
+.env
+
+# NOTE: Assets/ and Assets/StreamingAssets/ (including generated .glb models)
+# are intentionally tracked so the experience ships complete.
