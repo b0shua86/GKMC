@@ -67,9 +67,12 @@ namespace GKMC
             GKMCUtil.Cyl(w, "MarkerPostR", new Vector3(mx + 2f, 1.4f, zEntry), new Vector3(0.18f, 1.4f, 0.18f), wallMat);
             GKMCUtil.Box(w, "MarkerBoard", new Vector3(mx, 3.3f, zEntry), new Vector3(5f, 2.6f, 0.18f),
                 GKMCUtil.Mat(GKMCUtil.Dark(ti.secondary, 0.9f)));
-            GKMCUtil.Sign(w, "TrackNum", new Vector3(mx, 4.1f, zEntry - 0.12f), $"{ti.number:00}", ti.accent, 0.7f);
-            GKMCUtil.Sign(w, "TrackTitle", new Vector3(mx, 3.25f, zEntry - 0.12f), title, Color.white, 0.3f);
-            GKMCUtil.Sign(w, "ThemeChip", new Vector3(mx, 2.5f, zEntry - 0.12f), "[ " + ti.theme + " ]", ti.accent, 0.26f);
+            // Face the signs toward a player walking in along +Z (TextMesh at yaw 0 reads backwards
+            // from that side), and sit the text on the -Z face of the board.
+            var face = new Vector3(0f, 180f, 0f);
+            GKMCUtil.Sign(w, "TrackNum", new Vector3(mx, 4.1f, zEntry - 0.12f), $"{ti.number:00}", ti.accent, 0.7f, face);
+            GKMCUtil.Sign(w, "TrackTitle", new Vector3(mx, 3.25f, zEntry - 0.12f), title, Color.white, 0.3f, face);
+            GKMCUtil.Sign(w, "ThemeChip", new Vector3(mx, 2.5f, zEntry - 0.12f), "[ " + ti.theme + " ]", ti.accent, 0.26f, face);
 
             WorldTrigger.Create(w, ti.number, new Vector3(0f, WH * 0.5f, 0f), new Vector3(WW, WH, WL));
 

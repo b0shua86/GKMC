@@ -97,6 +97,7 @@ namespace GKMC
                 bool inst = await import.InstantiateMainSceneAsync(holder.transform);
                 if (!inst || anchor == null) { if (holder != null) Object.Destroy(holder); _fallbacks++; return; }
 
+                TameMaterials(holder.transform);
                 Fit(holder.transform, MeshyModels.Get(key));
                 DestroyAll(fallbackChildren);
                 _loaded++;
@@ -130,6 +131,29 @@ namespace GKMC
             Vector3 a = model.parent.position;
             float baseY = def.grounded ? b.min.y : b.center.y;
             model.position += new Vector3(a.x - b.center.x, a.y - baseY, a.z - b.center.z);
+        }
+
+        /// <summary>
+        /// Meshy GLBs are authored fully metallic (metallicFactor/roughnessFactor = 1). In the
+        /// Built-in render pipeline a fully-metallic surface shows no diffuse colour — it just
+        /// mirrors the bright sky and reads as flat white, hiding the texture. glTFast's shaders
+        /// are forks of Unity Standard, so turning metallic down to 0 (and ignoring the
+        /// metallic-roughness map) makes the base-colour texture show as albedo again.
+        /// </summary>
+        static void TameMaterials(Transform root)
+        {
+            foreach (var r in root.GetComponentsInChildren<Renderer>(true))
+            {
+                var mats = r.sharedMaterials;
+                for (int i = 0; i < mats.Length; i++)
+                {
+                    var m = mats[i];
+                    if (m == null || m.shader == null || !m.shader.name.StartsWith("glTF/")) continue;
+                    if (m.HasProperty("metallicFactor")) m.SetFloat("metallicFactor", 0f);
+                    if (m.HasProperty("roughnessFactor")) m.SetFloat("roughnessFactor", 0.55f);
+                    m.DisableKeyword("_METALLICGLOSSMAP"); // use the scalar factors, not the metal map
+                }
+            }
         }
     }
 }

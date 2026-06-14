@@ -117,7 +117,8 @@ namespace GKMC
             var spin = emblem.gameObject.AddComponent<Spinner>(); spin.axis = Vector3.up; spin.degPerSec = 35f;
 
             GKMCUtil.PointLight(root.transform, "EggGlow", new Vector3(0f, 2.2f, 0f), d.color, 1.8f, 8f);
-            GKMCUtil.Sign(root.transform, "EggLabel", new Vector3(0f, 3.6f, 0f), d.title, d.color, 0.32f);
+            // Faces -Z so it reads right to a player walking the tour in along +Z.
+            GKMCUtil.Sign(root.transform, "EggLabel", new Vector3(0f, 3.6f, 0f), d.title, d.color, 0.32f, new Vector3(0f, 180f, 0f));
 
             var sc = root.AddComponent<SphereCollider>();
             sc.center = new Vector3(0f, 2.2f, 0f);
