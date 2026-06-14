@@ -174,9 +174,34 @@ namespace GKMC
         IEnumerable<string> LocalCandidates(TrackInfo ti)
         {
             string dir = Path.Combine(Application.streamingAssetsPath, "Audio");
+
+            // 1) The canonical exact names (most reliable, e.g. 01.ogg / 01.mp3 / 01.wav).
             string baseName = Path.GetFileNameWithoutExtension(ti.audioFile);
             foreach (var ext in new[] { ".ogg", ".mp3", ".wav" })
                 yield return ToUri(Path.Combine(dir, baseName + ext));
+
+            // 2) Forgiving match: any audio file in the folder whose name *starts with* the track
+            //    number, so you can drop your own files in ("01 Sherane.mp3", "1 - Money Trees.ogg",
+            //    "10. m.A.A.d city.wav", …) without renaming them to exactly NN.ext first.
+            string[] files = null;
+            try { if (Directory.Exists(dir)) files = Directory.GetFiles(dir); }
+            catch { /* StreamingAssets isn't a real directory on Android/WebGL — skip the scan there */ }
+            if (files != null)
+                foreach (var f in files)
+                {
+                    string ext = Path.GetExtension(f).ToLowerInvariant();
+                    if (ext != ".ogg" && ext != ".mp3" && ext != ".wav") continue;
+                    if (LeadingNumber(Path.GetFileName(f)) != ti.number) continue;
+                    yield return ToUri(f);
+                }
+        }
+
+        // The integer at the start of a filename (e.g. "07 good kid.mp3" -> 7), or -1 if none.
+        static int LeadingNumber(string name)
+        {
+            int i = 0;
+            while (i < name.Length && char.IsDigit(name[i])) i++;
+            return i > 0 && int.TryParse(name.Substring(0, i), out var n) ? n : -1;
         }
 
         static string ToUri(string path)

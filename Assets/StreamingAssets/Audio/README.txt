@@ -4,20 +4,26 @@ AUDIO — good kid, m.A.A.d city tour
 The visual tour runs with or without audio. To hear the album as you walk, the
 manager resolves each track in this order:
 
-  1) A local file in THIS folder, named by track number:
-        01.ogg  Sherane a.k.a Master Splinter's Daughter
-        02.ogg  Bitch, Don't Kill My Vibe
-        03.ogg  Backseat Freestyle
-        04.ogg  The Art of Peer Pressure
-        05.ogg  Money Trees
-        06.ogg  Poetic Justice
-        07.ogg  good kid
-        08.ogg  m.A.A.d city
-        09.ogg  Swimming Pools (Drank)
-        10.ogg  Sing About Me, I'm Dying of Thirst
-        11.ogg  Real
-        12.ogg  Compton
-     (.ogg is most reliable in Unity; .mp3 / .wav also work.)
+  1) A local file in THIS folder, one per track. The file just has to START with the
+     track number (so your own filenames work without renaming) — these all match:
+        01.ogg            "01 Sherane.mp3"        1 - Money Trees.wav
+     Track order (match this, e.g. for the deluxe edition's different numbering):
+        01  Sherane a.k.a Master Splinter's Daughter
+        02  Bitch, Don't Kill My Vibe
+        03  Backseat Freestyle
+        04  The Art of Peer Pressure
+        05  Money Trees
+        06  Poetic Justice
+        07  good kid
+        08  m.A.A.d city
+        09  Swimming Pools (Drank)
+        10  Sing About Me, I'm Dying of Thirst
+        11  Real
+        12  Compton
+     Use .ogg (most reliable in Unity), .mp3, or .wav. Convert other formats
+     (.m4a/.aac/.flac) first — Unity can't decode those at runtime. Audio you drop
+     here is git-ignored, so a personal copy won't be committed to the repo.
+     If no real file is found, a procedural mood score plays instead (never silent).
 
   2) A stream resolver URL (optional), if you set one — see below.
 
