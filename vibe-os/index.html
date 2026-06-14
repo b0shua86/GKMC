@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>VIBE OS</title>
+<meta name="description" content="VIBE OS — a Windows XP–flavored desktop that builds whatever app you search for." />
+<link rel="stylesheet" href="styles.css" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' rx='3' fill='%23245edb'/><text x='8' y='12' font-size='11' text-anchor='middle' fill='white' font-family='sans-serif'>V</text></svg>" />
+</head>
+<body>
+
+  <!-- ===== Boot screen ===== -->
+  <div id="boot" class="boot">
+    <div class="boot-logo">
+      <span class="boot-vibe">VIBE</span><span class="boot-os">OS</span>
+    </div>
+    <div class="boot-bar"><div class="boot-bar-fill"></div></div>
+    <div class="boot-tag">building your vibe&hellip;</div>
+    <div class="boot-copy">VIBE Corporation &middot; press any key to skip</div>
+  </div>
+
+  <!-- ===== Desktop ===== -->
+  <div id="desktop" class="desktop hidden">
+
+    <!-- Desktop icons -->
+    <div id="desktop-icons" class="desktop-icons"></div>
+
+    <!-- Centered "build an app" search widget -->
+    <div id="hero" class="hero">
+      <div class="hero-logo"><span class="hero-vibe">VIBE</span><span class="hero-os">OS</span></div>
+      <div class="hero-sub">type any app and press Enter &mdash; VIBE OS builds it</div>
+      <form id="hero-form" class="hero-search" autocomplete="off">
+        <input id="hero-input" type="text" placeholder="build me a&hellip; calculator, paint, snake, budget tracker, piano&hellip;" />
+        <button type="submit">Build&nbsp;it&nbsp;&#9654;</button>
+      </form>
+      <div id="hero-chips" class="hero-chips"></div>
+    </div>
+
+    <!-- Window layer -->
+    <div id="windows" class="windows"></div>
+
+    <!-- Taskbar -->
+    <div id="taskbar" class="taskbar">
+      <button id="start-btn" class="start-btn">
+        <span class="start-flag">
+          <span></span><span></span><span></span><span></span>
+        </span>
+        <span class="start-text">start</span>
+      </button>
+      <div id="task-buttons" class="task-buttons"></div>
+      <div class="tray">
+        <div id="tray-icons" class="tray-icons"></div>
+        <div id="clock" class="clock">12:00 PM</div>
+      </div>
+    </div>
+
+    <!-- Start menu -->
+    <div id="start-menu" class="start-menu hidden">
+      <div class="sm-header">
+        <div class="sm-avatar">V</div>
+        <div class="sm-user">VIBE User</div>
+      </div>
+      <div class="sm-body">
+        <div class="sm-left">
+          <div class="sm-search">
+            <form id="sm-form" autocomplete="off">
+              <input id="sm-input" type="text" placeholder="Search to build an app&hellip;" />
+            </form>
+          </div>
+          <div id="sm-pinned" class="sm-list"></div>
+        </div>
+        <div class="sm-right">
+          <div id="sm-recent" class="sm-list sm-list-light"></div>
+        </div>
+      </div>
+      <div class="sm-footer">
+        <button id="sm-logoff" class="sm-foot-btn">↩ Log Off</button>
+        <button id="sm-shutdown" class="sm-foot-btn">⏻ Turn Off</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Right-click context menu -->
+  <div id="ctx" class="ctx hidden"></div>
+
+  <script src="apps.js"></script>
+  <script src="os.js"></script>
+</body>
+</html>
