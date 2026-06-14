@@ -33,6 +33,7 @@ namespace GKMC
             // Track-world props.
             A("car", 4.6f);
             A("lowrider", 4.8f);
+            A("minivan", 4.9f);
             A("money_tree", 7f);
             A("palm_tree", 9f);
             A("heart", 3.6f, false);

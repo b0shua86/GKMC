@@ -108,7 +108,8 @@ namespace GKMC
                 GKMCUtil.Box(w, "Lane", new Vector3(0f, 0.06f, i * 8f), new Vector3(0.4f, 0.02f, 3f),
                     GKMCUtil.MatEmissive(Color.yellow, Color.yellow, 1.2f), false);
 
-            Car(w, new Vector3(-6f, 0f, -6f), new Color(0.25f, 0.03f, 0.04f), 0f);
+            // The purple minivan from the album's story — the van he borrows to drive to Sherane's.
+            Minivan(w, new Vector3(-6f, 0f, -6f), 8f, new Color(0.38f, 0.13f, 0.5f));
             House(w, new Vector3(9f, 0f, 18f), new Vector3(11f, 7f, 7f), new Color(1f, 0.7f, 0.35f));
             var porch = GKMCUtil.PointLight(w, "PorchLight", new Vector3(6.5f, 2.6f, 14f), new Color(1f, 0.6f, 0.3f), 3.5f, 14f);
             GKMCUtil.Particles(w, "Moths", new Vector3(6.5f, 2.6f, 14f), new Color(1f, 0.8f, 0.5f),
@@ -310,6 +311,13 @@ namespace GKMC
             GKMCUtil.SpotLight(w, "LightFromAbove", new Vector3(0f, 13f, 16f), new Vector3(90f, 0f, 0f), Color.white, 7f, 16f, 35f);
             GKMCUtil.Particles(w, "Ascend", new Vector3(0f, 1f, 16f), new Color(1f, 1f, 0.95f, 0.7f),
                 14f, 0.18f, 5f, new Vector3(5f, 1f, 5f), new Vector3(0f, 1.2f, 0f));
+
+            // A dim cemetery in the background — the city's dead. The old COMPTON sign becomes its marker.
+            for (int row = 0; row < 3; row++)
+                for (int col = 0; col < 4; col++)
+                    Gravestone(w, new Vector3(-14f + col * 1.8f, 0f, 8f + row * 3f));
+            CitySign(w, new Vector3(-11f, 0f, 22f), "COMPTON");
+            GKMCUtil.PointLight(w, "CemeteryGlow", new Vector3(-11f, 3f, 16f), new Color(0.5f, 0.45f, 0.35f), 0.8f, 16f);
         }
 
         // 11 — Real: a glowing, beating heart ringed by mirrors of truth.
@@ -326,29 +334,66 @@ namespace GKMC
             GKMCUtil.PointLight(w, "Warm", new Vector3(0f, 8f, 4f), new Color(1f, 0.8f, 0.6f), 1.2f, 35f);
         }
 
-        // 12 — Compton: bright daylight, palm-lined boulevard, the city sign, confetti, and lowriders
-        //      hopping in every classic style — the celebration of the hometown.
+        // 12 — Compton: Rosecrans Blvd. A wide "Hub City" commercial corridor — strip-mall
+        //      storefronts, a gas station, power poles, palms, the purple minivan parked at the
+        //      curb and lowriders hopping in every classic style. Modelled on the real avenue.
         static void World12_Compton(TrackInfo ti, Transform w)
         {
-            var road = GKMCUtil.Mat(new Color(0.12f, 0.12f, 0.14f), 0.1f, 0.4f);
-            GKMCUtil.Box(w, "Boulevard", new Vector3(0f, 0.03f, 0f), new Vector3(10f, 0.06f, WL - 4f), road, false);
-            for (int i = 0; i < 6; i++)
+            // Wide boulevard with sidewalks and lane markings.
+            var road = GKMCUtil.Mat(new Color(0.1f, 0.1f, 0.12f), 0.1f, 0.4f);
+            GKMCUtil.Box(w, "Boulevard", new Vector3(0f, 0.03f, 0f), new Vector3(14f, 0.06f, WL - 2f), road, false);
+            var walk = GKMCUtil.Mat(new Color(0.45f, 0.45f, 0.47f), 0f, 0.3f);
+            GKMCUtil.Box(w, "SidewalkL", new Vector3(-10f, 0.05f, 0f), new Vector3(6f, 0.08f, WL - 2f), walk, false);
+            GKMCUtil.Box(w, "SidewalkR", new Vector3(10f, 0.05f, 0f), new Vector3(6f, 0.08f, WL - 2f), walk, false);
+            var yellow = GKMCUtil.MatEmissive(new Color(1f, 0.8f, 0f), new Color(1f, 0.7f, 0f), 0.6f);
+            GKMCUtil.Box(w, "CenterLineL", new Vector3(-0.4f, 0.07f, 0f), new Vector3(0.2f, 0.02f, WL - 4f), yellow, false);
+            GKMCUtil.Box(w, "CenterLineR", new Vector3(0.4f, 0.07f, 0f), new Vector3(0.2f, 0.02f, WL - 4f), yellow, false);
+            for (int i = -4; i <= 4; i++)
             {
-                float z = -18f + i * 7f;
-                PalmTree(w, new Vector3(-9f, 0f, z));
-                PalmTree(w, new Vector3(9f, 0f, z));
+                GKMCUtil.Box(w, "LaneDashL", new Vector3(-3.5f, 0.07f, i * 5f), new Vector3(0.18f, 0.02f, 2f), GKMCUtil.Mat(Color.gray), false);
+                GKMCUtil.Box(w, "LaneDashR", new Vector3(3.5f, 0.07f, i * 5f), new Vector3(0.18f, 0.02f, 2f), GKMCUtil.Mat(Color.gray), false);
             }
-            CitySign(w, new Vector3(0f, 0f, 18f), "COMPTON");
 
-            // The lowrider showcase — a few cars, each bouncing in a different hydraulic style.
-            Lowrider(w, new Vector3(-3f, 0f, 0f), 0f, new Color(0.6f, 0.1f, 0.65f), LowriderHop.Style.FullBounce);
-            Lowrider(w, new Vector3(4f, 0f, -10f), 12f, new Color(0.7f, 0.08f, 0.1f), LowriderHop.Style.ThreeWheel);
-            Lowrider(w, new Vector3(-4f, 0f, 10f), -14f, new Color(0.1f, 0.45f, 0.7f), LowriderHop.Style.SideToSide);
-            Lowrider(w, new Vector3(3f, 0f, 6f), 180f, new Color(0.1f, 0.55f, 0.2f), LowriderHop.Style.FrontBack);
-            Lowrider(w, new Vector3(0f, 0f, -16f), 0f, new Color(0.85f, 0.7f, 0.1f), LowriderHop.Style.Pancake);
+            // Strip-mall storefronts (single-story), generic signage in the Rosecrans mix.
+            var leftLabels = new[] { "LIQUOR", "TACOS", "BARBER", "MARKET" };
+            var leftZ = new[] { -8f, 1f, 10f, 19f };
+            var leftCol = new[] { new Color(0.55f, 0.1f, 0.12f), new Color(0.1f, 0.4f, 0.5f), new Color(0.2f, 0.2f, 0.55f), new Color(0.5f, 0.45f, 0.15f) };
+            for (int i = 0; i < leftLabels.Length; i++)
+                Storefront(w, new Vector3(-13.5f, 0f, leftZ[i]), 90f, 8f, leftCol[i], leftLabels[i]);
 
-            GKMCUtil.Particles(w, "Confetti", new Vector3(0f, 12f, 0f), new Color(1f, 0.85f, 0.3f),
-                40f, 0.2f, 8f, new Vector3(WW - 4f, 1f, WL - 6f), new Vector3(0.5f, -1.2f, 0f));
+            var rightLabels = new[] { "AUTO PARTS", "BURGERS", "CHECK CASHING", "DONUTS", "CHURCH" };
+            var rightZ = new[] { -16f, -7f, 2f, 11f, 20f };
+            var rightCol = new[] { new Color(0.2f, 0.3f, 0.5f), new Color(0.6f, 0.2f, 0.1f), new Color(0.15f, 0.45f, 0.2f), new Color(0.6f, 0.45f, 0.5f), new Color(0.45f, 0.35f, 0.55f) };
+            for (int i = 0; i < rightLabels.Length; i++)
+                Storefront(w, new Vector3(13.5f, 0f, rightZ[i]), -90f, 8f, rightCol[i], rightLabels[i]);
+
+            // Corner gas station / convenience store.
+            GasStation(w, new Vector3(-12f, 0f, -21f));
+
+            // Power poles + lines along the right curb (very Compton skyline).
+            var poleZ = new[] { -22f, -9f, 4f, 17f };
+            foreach (var z in poleZ) UtilityPole(w, new Vector3(15.5f, 0f, z));
+            PowerLines(w, 15.5f, 8.3f, poleZ);
+
+            // Palms on the sidewalks.
+            for (int i = 0; i < 4; i++) PalmTree(w, new Vector3(-9f, 0f, -13f + i * 10f));
+            for (int i = 0; i < 3; i++) PalmTree(w, new Vector3(9f, 0f, -2f + i * 10f));
+
+            // Far-end mural (replaces the billboard sign).
+            MuralWall(w, new Vector3(0f, 0f, 24f), "HUB CITY");
+
+            // The purple album minivan, parked proudly at the curb.
+            Minivan(w, new Vector3(-6.5f, 0f, 4f), -4f, new Color(0.38f, 0.13f, 0.5f));
+
+            // Lowrider showcase — each bouncing in a different hydraulic style.
+            Lowrider(w, new Vector3(-3f, 0f, -2f), 0f, new Color(0.6f, 0.1f, 0.65f), LowriderHop.Style.FullBounce);
+            Lowrider(w, new Vector3(3.5f, 0f, -12f), 8f, new Color(0.7f, 0.08f, 0.1f), LowriderHop.Style.ThreeWheel);
+            Lowrider(w, new Vector3(-3.5f, 0f, 12f), -10f, new Color(0.1f, 0.45f, 0.7f), LowriderHop.Style.SideToSide);
+            Lowrider(w, new Vector3(3f, 0f, 4f), 180f, new Color(0.1f, 0.55f, 0.2f), LowriderHop.Style.FrontBack);
+            Lowrider(w, new Vector3(0f, 0f, -18f), 0f, new Color(0.85f, 0.7f, 0.1f), LowriderHop.Style.Pancake);
+
+            GKMCUtil.Particles(w, "Confetti", new Vector3(0f, 12f, 6f), new Color(1f, 0.85f, 0.3f),
+                22f, 0.18f, 8f, new Vector3(14f, 1f, 20f), new Vector3(0.4f, -1.2f, 0f));
             GKMCUtil.PointLight(w, "Daylight", new Vector3(0f, 14f, 0f), new Color(1f, 0.97f, 0.85f), 1.8f, 60f);
         }
 
@@ -384,6 +429,25 @@ namespace GKMC
                 new Vector3(-wx, wy, wz), new Vector3(wx, wy, wz),
                 new Vector3(-wx, wy, -wz), new Vector3(wx, wy, -wz) })
                 GKMCUtil.Cyl(t, "Wheel", p, new Vector3(0.8f, 0.15f, 0.8f), low ? chrome : tire, false, new Vector3(0f, 0f, 90f));
+        }
+
+        static Transform Minivan(Transform w, Vector3 pos, float yaw, Color color)
+            => ModelLibrary.SpawnOrFallback("minivan", w, pos, new Vector3(0f, yaw, 0f), t => MinivanInto(t, color));
+
+        static void MinivanInto(Transform t, Color color)
+        {
+            var body = GKMCUtil.Mat(color, 0.45f, 0.55f);
+            var glass = GKMCUtil.Mat(new Color(0.05f, 0.08f, 0.1f), 0.3f, 0.9f);
+            var tire = GKMCUtil.Mat(new Color(0.03f, 0.03f, 0.03f));
+            var chrome = GKMCUtil.Mat(new Color(0.8f, 0.8f, 0.85f), 0.9f, 0.9f);
+            GKMCUtil.Box(t, "Body", new Vector3(0f, 0.95f, 0f), new Vector3(2.1f, 1.4f, 4.8f), body, false);
+            GKMCUtil.Box(t, "Greenhouse", new Vector3(0f, 1.85f, 0.1f), new Vector3(1.95f, 0.85f, 3.4f), glass, false);
+            GKMCUtil.Box(t, "Hood", new Vector3(0f, 0.8f, 2.45f), new Vector3(2.0f, 0.6f, 0.7f), body, false);
+            GKMCUtil.Box(t, "Bumper", new Vector3(0f, 0.45f, 2.5f), new Vector3(2.1f, 0.25f, 0.3f), chrome, false);
+            foreach (var p in new[] {
+                new Vector3(-1.0f, 0.5f, 1.6f), new Vector3(1.0f, 0.5f, 1.6f),
+                new Vector3(-1.0f, 0.5f, -1.6f), new Vector3(1.0f, 0.5f, -1.6f) })
+                GKMCUtil.Cyl(t, "Wheel", p, new Vector3(0.9f, 0.16f, 0.9f), tire, false, new Vector3(0f, 0f, 90f));
         }
 
         static void Candle(Transform w, Vector3 pos, Color flame, bool bob)
@@ -476,6 +540,77 @@ namespace GKMC
             GKMCUtil.Box(w, "House", pos + new Vector3(0f, size.y * 0.5f, 0f), size, dark);
             GKMCUtil.Box(w, "Window", pos + new Vector3(0f, size.y * 0.45f, -size.z * 0.5f - 0.05f),
                 new Vector3(1.8f, 1.8f, 0.1f), GKMCUtil.MatEmissive(windowColor, windowColor, 3f), false);
+        }
+
+        static void Storefront(Transform w, Vector3 pos, float yaw, float width, Color wall, string label)
+        {
+            var go = new GameObject("Storefront_" + label);
+            go.transform.SetParent(w, false);
+            go.transform.localPosition = pos;
+            go.transform.localEulerAngles = new Vector3(0f, yaw, 0f);
+            var t = go.transform;
+            const float h = 5f, d = 6f;
+            GKMCUtil.Box(t, "Building", new Vector3(0f, h * 0.5f, -d * 0.5f), new Vector3(width, h, d), GKMCUtil.Mat(GKMCUtil.Dark(wall, 0.7f)));
+            GKMCUtil.Box(t, "Facade", new Vector3(0f, h * 0.5f, 0.1f), new Vector3(width, h, 0.3f), GKMCUtil.Mat(wall), false);
+            GKMCUtil.Box(t, "Windows", new Vector3(0f, 1.4f, 0.3f), new Vector3(width * 0.82f, 2.2f, 0.1f), GKMCUtil.Mat(new Color(0.06f, 0.1f, 0.12f), 0.3f, 0.9f), false);
+            GKMCUtil.Box(t, "SignBand", new Vector3(0f, h - 0.6f, 0.35f), new Vector3(width * 0.9f, 1.1f, 0.2f), GKMCUtil.MatEmissive(Color.white, Color.white, 0.8f), false);
+            GKMCUtil.Sign(t, "SignText", new Vector3(0f, h - 0.6f, 0.5f), label, new Color(0.85f, 0.08f, 0.1f), 0.5f);
+        }
+
+        static void GasStation(Transform w, Vector3 pos)
+        {
+            var go = new GameObject("GasStation");
+            go.transform.SetParent(w, false);
+            go.transform.localPosition = pos;
+            var t = go.transform;
+            var white = GKMCUtil.Mat(new Color(0.85f, 0.85f, 0.88f));
+            var red = GKMCUtil.MatEmissive(new Color(0.9f, 0.2f, 0.1f), new Color(0.9f, 0.2f, 0.1f), 1.2f);
+            GKMCUtil.Box(t, "Canopy", new Vector3(0f, 5f, 0f), new Vector3(9f, 0.5f, 8f), white, false);
+            GKMCUtil.Box(t, "CanopyBand", new Vector3(0f, 4.6f, 4f), new Vector3(9f, 0.4f, 0.2f), red, false);
+            foreach (var p in new[] { new Vector3(-3.5f, 2.5f, 3f), new Vector3(3.5f, 2.5f, 3f), new Vector3(-3.5f, 2.5f, -3f), new Vector3(3.5f, 2.5f, -3f) })
+                GKMCUtil.Box(t, "Pillar", p, new Vector3(0.4f, 5f, 0.4f), white);
+            for (int i = -1; i <= 1; i += 2)
+                GKMCUtil.Box(t, "Pump", new Vector3(i * 1.6f, 0.8f, 0f), new Vector3(0.7f, 1.6f, 1.2f), GKMCUtil.Mat(new Color(0.7f, 0.7f, 0.72f)));
+            GKMCUtil.Cyl(t, "SignPole", new Vector3(4.5f, 3.5f, 4f), new Vector3(0.25f, 3.5f, 0.25f), GKMCUtil.Mat(new Color(0.2f, 0.2f, 0.2f)));
+            GKMCUtil.Box(t, "PriceSign", new Vector3(4.5f, 6.5f, 4f), new Vector3(2f, 1.4f, 0.2f), red, false);
+            GKMCUtil.Sign(t, "GasText", new Vector3(4.5f, 6.5f, 3.85f), "GAS", Color.white, 0.45f, new Vector3(0f, 180f, 0f));
+        }
+
+        static void UtilityPole(Transform w, Vector3 pos)
+        {
+            var wood = GKMCUtil.Mat(new Color(0.22f, 0.16f, 0.1f));
+            GKMCUtil.Cyl(w, "Pole", pos + new Vector3(0f, 4.5f, 0f), new Vector3(0.3f, 4.5f, 0.3f), wood);
+            GKMCUtil.Box(w, "Crossbar", pos + new Vector3(0f, 8.3f, 0f), new Vector3(2.4f, 0.18f, 0.18f), wood, false);
+            GKMCUtil.Box(w, "Crossbar2", pos + new Vector3(0f, 7.7f, 0f), new Vector3(1.8f, 0.16f, 0.16f), wood, false);
+            // A transformer can.
+            GKMCUtil.Cyl(w, "Transformer", pos + new Vector3(0.5f, 7f, 0f), new Vector3(0.5f, 0.5f, 0.5f), GKMCUtil.Mat(new Color(0.4f, 0.4f, 0.42f), 0.6f, 0.4f), false);
+        }
+
+        static void PowerLines(Transform w, float x, float y, float[] zList)
+        {
+            var wire = GKMCUtil.Mat(new Color(0.02f, 0.02f, 0.02f));
+            System.Array.Sort(zList);
+            for (int i = 0; i < zList.Length - 1; i++)
+            {
+                float z0 = zList[i], z1 = zList[i + 1];
+                float mid = (z0 + z1) * 0.5f, len = Mathf.Abs(z1 - z0);
+                foreach (float off in new[] { -0.8f, 0f, 0.8f })
+                    GKMCUtil.Box(w, "Wire", new Vector3(x + off, y - 0.1f, mid), new Vector3(0.05f, 0.05f, len), wire, false);
+            }
+        }
+
+        static void MuralWall(Transform w, Vector3 pos, string text)
+        {
+            GKMCUtil.Box(w, "MuralWall", pos + new Vector3(0f, 4f, 0f), new Vector3(WW - 2f, 8f, 0.6f), GKMCUtil.Mat(new Color(0.82f, 0.78f, 0.68f)));
+            GKMCUtil.Sign(w, "MuralText", pos + new Vector3(0f, 5f, -0.35f), text, new Color(0.9f, 0.1f, 0.18f), 1.9f, new Vector3(0f, 180f, 0f));
+            GKMCUtil.Sign(w, "MuralSub", pos + new Vector3(0f, 2.7f, -0.35f), "C O M P T O N", new Color(0.1f, 0.2f, 0.6f), 0.7f, new Vector3(0f, 180f, 0f));
+        }
+
+        static void Gravestone(Transform w, Vector3 pos)
+        {
+            var stone = GKMCUtil.Mat(new Color(0.42f, 0.42f, 0.45f), 0.2f, 0.35f);
+            GKMCUtil.Box(w, "Grave", pos + new Vector3(0f, 0.6f, 0f), new Vector3(0.8f, 1.2f, 0.18f), stone);
+            GKMCUtil.Cyl(w, "GraveTop", pos + new Vector3(0f, 1.2f, 0f), new Vector3(0.8f, 0.09f, 0.8f), stone, false, new Vector3(90f, 0f, 0f));
         }
 
         static void EiffelTower(Transform w, Vector3 pos, Material gold)

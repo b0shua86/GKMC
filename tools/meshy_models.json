@@ -5,6 +5,8 @@
       "prompt": "a weathered 1990s American sedan car, dusty matte paint, slightly lowered stance, game-ready low poly, neutral studio lighting" },
     { "key": "lowrider", "essential": true, "target_size": 4.8,
       "prompt": "a classic candy-paint lowrider car with chrome wire wheels and gold trim, glossy hydraulics, west coast custom, game-ready" },
+    { "key": "minivan", "essential": true, "target_size": 4.9,
+      "prompt": "a 1990s purple Plymouth Voyager family minivan, boxy, slightly worn glossy purple paint, chrome bumpers, game-ready" },
     { "key": "money_tree", "essential": true, "target_size": 7.0,
       "prompt": "a stylized small tree with green leaves shaped like folded dollar bills and glowing golden money, game-ready" },
     { "key": "palm_tree", "essential": true, "target_size": 9.0,
