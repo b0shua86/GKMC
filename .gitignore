@@ -41,3 +41,10 @@ meshy.key
 
 # NOTE: Assets/ and Assets/StreamingAssets/ (including generated .glb models)
 # are intentionally tracked so the experience ships complete.
+
+# Local album audio you supply yourself stays OUT of the repo (it's copyrighted).
+# Drop 01.ogg..12.ogg in Assets/StreamingAssets/Audio/ for local playback only.
+Assets/StreamingAssets/Audio/*.ogg
+Assets/StreamingAssets/Audio/*.mp3
+Assets/StreamingAssets/Audio/*.wav
+Assets/StreamingAssets/Audio/*.m4a
