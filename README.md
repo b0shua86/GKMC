@@ -13,7 +13,7 @@ or prefab files to break. Open the folder in Unity and press **Play**.
 
 ## Quick start
 
-1. Install **Unity 6 LTS (6000.0)** with **Build Support** for your platform (via Unity Hub ▸ Installs). The project is pinned to `6000.0.32f1` — if Hub prompts, open it with whatever `6000.0.x` you have installed.
+1. Install **Unity 6** with **Build Support** for your platform (via Unity Hub ▸ Installs). The project is pinned to `6000.4.11f1` — if Hub prompts, open it with whatever `6000.x` you have installed.
 2. Open this folder as a project (Unity Hub ▸ *Add project from disk* ▸ select this folder).
 3. Press **Play**. The tour builds itself (auto-boot works even in an empty scene).
    - Prefer a saved scene? Menu **GKMC ▸ Create Tour Scene**.
