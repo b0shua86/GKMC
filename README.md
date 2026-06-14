@@ -13,7 +13,7 @@ or prefab files to break. Open the folder in Unity and press **Play**.
 
 ## Quick start
 
-1. Install **Unity 2022.3 LTS** (any 2021.3+ should work) with **Build Support** for your platform.
+1. Install **Unity 6 LTS (6000.0)** with **Build Support** for your platform (via Unity Hub ▸ Installs). The project is pinned to `6000.0.32f1` — if Hub prompts, open it with whatever `6000.0.x` you have installed.
 2. Open this folder as a project (Unity Hub ▸ *Add project from disk* ▸ select this folder).
 3. Press **Play**. The tour builds itself (auto-boot works even in an empty scene).
    - Prefer a saved scene? Menu **GKMC ▸ Create Tour Scene**.
@@ -117,7 +117,7 @@ tools/       meshy_models.json (catalogue), meshy_generate.py (generator)
 - **Nothing happens on Play** — confirm one `GKMC_Experience` object exists (auto-boot makes one) and check the Console.
 - **No audio** — expected until you add `Audio/NN.ogg` files or a resolver (visuals are unaffected).
 - **Models don't appear** — primitives are the fallback; for GLB confirm glTFast + the `GKMC_GLTFAST` define, and that files sit in `Assets/StreamingAssets/Models/`.
-- **Text missing** — uses Unity's built-in `LegacyRuntime.ttf`; present in 2022.3.
+- **Text missing** — uses Unity's built-in `LegacyRuntime.ttf`; present in Unity 6.
 
 ---
 
