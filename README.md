@@ -77,19 +77,27 @@ at a resolver — full details in `Assets/StreamingAssets/Audio/README.txt`. Cop
 
 ---
 
-## 3D models with Meshy AI (optional, recommended)
+## 3D models (textured GLB — on by default)
 
-Every prop renders as a procedural primitive by default and **upgrades to a real model** when one
-is present. Generate or fetch them, then drop a `<key>.glb` into `Assets/StreamingAssets/Models/`.
+The bundled `.glb` props in `Assets/StreamingAssets/Models/` **load at runtime** through
+[glTFast](https://docs.unity3d.com/Packages/com.unity.cloud.gltfast@6.18). The package is wired
+into `Packages/manifest.json` (`com.unity.cloud.gltfast` 6.18.0) and switched on by the
+`GKMC_GLTFAST` define in `Assets/csc.rsp`, so opening the project and pressing **Play** shows the
+real models. Each prop still builds its procedural primitive first and **swaps to the model** once
+it finishes loading, so the world is never empty and any prop without a `.glb` stays procedural.
 
-**Generate / fetch**
+- **Prefer procedural-only?** Remove `com.unity.cloud.gltfast` from the manifest and delete
+  `Assets/csc.rsp` — the code falls back automatically (no other change needed).
+- **No internet on first open?** glTFast can't download; either restore it later or run
+  procedural-only as above.
+- **Natively-imported assets** (FBX/OBJ/prefab) at `Assets/Resources/GKMC_Models/<key>` are used
+  ahead of the GLB and need no package at all.
+
+**Generate / fetch more** (Meshy AI)
 - In Unity: **GKMC ▸ Open Meshy Generator** (key stored in EditorPrefs, never in the repo).
 - CLI: `export MESHY_API_KEY=...` then `python3 tools/meshy_generate.py --essential` (add `--refine` for textures, `--all` for everything).
 - **Community models:** grab a model's direct **GLB URL** from [meshy.ai/discover](https://www.meshy.ai/discover) (or your library) and add `"glb_url": "https://..."` (or `"task_id": "..."`) to that key in `tools/meshy_models.json` — the generator downloads instead of generating.
-
-**Load GLB at runtime** (textured): install `com.unity.cloud.gltfast` (Package Manager ▸ *Add by name*),
-then **GKMC ▸ Enable glTFast (GKMC_GLTFAST)**. No glTFast? Put natively-imported FBX/OBJ/prefabs at
-`Assets/Resources/GKMC_Models/<key>` instead — no package needed.
+- Drop any new `<key>.glb` into `Assets/StreamingAssets/Models/`.
 
 Model keys + prompts live in `tools/meshy_models.json`; runtime sizes in
 `Assets/GKMC/Scripts/Models/MeshyModels.cs`.
@@ -121,7 +129,7 @@ tools/       meshy_models.json (catalogue), meshy_generate.py (generator)
 ## Troubleshooting
 - **Nothing happens on Play** — confirm one `GKMC_Experience` object exists (auto-boot makes one) and check the Console.
 - **Audio** — a procedural score always plays; drop `Audio/NN.ogg` files (or set a resolver) to hear the real album instead.
-- **Models don't appear** — textured GLB props are an optional upgrade. By default every prop renders as a procedural primitive; to load the bundled `.glb` files install `com.unity.cloud.gltfast` and run **GKMC ▸ Enable glTFast (GKMC_GLTFAST)**, with files in `Assets/StreamingAssets/Models/`.
+- **Models don't appear** — GLB loading needs `com.unity.cloud.gltfast` (in `Packages/manifest.json`) plus the `GKMC_GLTFAST` define (in `Assets/csc.rsp`); both ship enabled. If the package failed to resolve (e.g. offline on first open) every prop stays a procedural primitive. Check the Console — `ModelLibrary` logs loaded-vs-procedural counts.
 - **Text missing** — uses Unity's built-in `LegacyRuntime.ttf`; present in Unity 6.
 
 ---

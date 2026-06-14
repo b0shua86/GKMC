@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "com.unity.cloud.gltfast": "6.18.0",
     "com.unity.ugui": "2.0.0",
     "com.unity.modules.audio": "1.0.0",
     "com.unity.modules.imgui": "1.0.0",
@@ -12,5 +13,6 @@
     "com.unity.modules.unitywebrequest": "1.0.0",
     "com.unity.modules.unitywebrequestaudio": "1.0.0"
   },
-  "_comment": "Unity 6 (6000.4.11f1). UGUI 2.0 already includes TextMeshPro. For textured GLB models add \"com.unity.cloud.gltfast\" via Window > Package Manager (Add package by name), then run GKMC > Enable glTFast (GKMC_GLTFAST). Without it, models load from a Resources folder or fall back to procedural primitives."
+  "_comment": "Unity 6 (6000.4.11f1). UGUI 2.0 already includes TextMeshPro. Textured GLB models are enabled: com.unity.cloud.gltfast loads the .glb props in StreamingAssets/Models at runtime, switched on by the GKMC_GLTFAST define in Assets/csc.rsp. UPM pulls glTFast's own dependencies (mathematics/burst/collections) automatically. To go back to procedural-only props, remove this package and the csc.rsp file (the code falls back automatically)."
 }
+
