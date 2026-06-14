@@ -42,10 +42,10 @@ namespace GKMC
             camGo.transform.localPosition = new Vector3(0f, 1.65f, 0f);
             var cam = camGo.AddComponent<Camera>();
             cam.tag = "MainCamera";
-            cam.clearFlags = CameraClearFlags.SolidColor;
+            cam.clearFlags = CameraClearFlags.Skybox;   // show the sky / clouds, not a flat colour
             cam.backgroundColor = Color.black;
             cam.nearClipPlane = 0.05f;
-            cam.farClipPlane = 900f;
+            cam.farClipPlane = 1600f;
             camGo.AddComponent<AudioListener>();
 
             var pc = go.AddComponent<PlayerController>();

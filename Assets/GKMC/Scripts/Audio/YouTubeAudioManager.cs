@@ -31,11 +31,14 @@ namespace GKMC
         AudioSource _a, _b;
         AudioSource _active;
         readonly Dictionary<int, AudioClip> _cache = new Dictionary<int, AudioClip>();
+        readonly Dictionary<int, bool> _cacheProc = new Dictionary<int, bool>();
         int _currentTrack = -1;
         Coroutine _fade;
+        bool _pendingProc;   // was the clip just resolved a procedural score?
 
         public int CurrentTrack => _currentTrack;
         public bool LastTrackHadAudio { get; private set; }
+        public bool LastTrackWasProcedural { get; private set; }
 
         public static YouTubeAudioManager Create(Transform parent, List<TrackInfo> tracks)
         {
@@ -101,17 +104,19 @@ namespace GKMC
             if (_cache.TryGetValue(ti.number, out var cached))
             {
                 clip = cached;
+                LastTrackWasProcedural = _cacheProc.TryGetValue(ti.number, out var p) && p;
             }
             else
             {
                 yield return StartCoroutine(Resolve(ti, c => clip = c));
-                if (clip != null) _cache[ti.number] = clip;
+                LastTrackWasProcedural = _pendingProc;
+                if (clip != null) { _cache[ti.number] = clip; _cacheProc[ti.number] = _pendingProc; }
             }
 
             LastTrackHadAudio = clip != null;
             if (clip == null)
             {
-                // No audio available — fade out whatever was playing; visuals continue regardless.
+                // Should not happen (procedural fallback always returns a clip) — but stay safe.
                 yield return StartCoroutine(Fade(_active, _active.volume, 0f));
                 _active.Stop();
                 yield break;
@@ -140,6 +145,8 @@ namespace GKMC
 
         IEnumerator Resolve(TrackInfo ti, System.Action<AudioClip> done)
         {
+            _pendingProc = false;
+
             // 1) Local StreamingAssets file (try the configured name, then common extensions).
             foreach (var candidate in LocalCandidates(ti))
             {
@@ -157,10 +164,11 @@ namespace GKMC
                 if (ok) yield break;
             }
 
-            Debug.Log($"[GKMC] No playable audio for track {ti.number} \"{ti.title}\". " +
-                      $"Drop a file at StreamingAssets/Audio/{ti.audioFile} or set a stream resolver. " +
-                      $"YouTube link: {ti.youtubeUrl}");
-            done(null);
+            // 3) Always-available procedural score so the tour is never silent.
+            Debug.Log($"[GKMC] Procedural score for track {ti.number} \"{ti.title}\". " +
+                      $"Drop StreamingAssets/Audio/{ti.audioFile} to hear the album instead.");
+            _pendingProc = true;
+            done(ProceduralMusic.Generate(ti));
         }
 
         IEnumerable<string> LocalCandidates(TrackInfo ti)

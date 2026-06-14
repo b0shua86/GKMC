@@ -2,9 +2,10 @@
 
 A first-person, tourable interpretation of Kendrick Lamar's *good kid, m.A.A.d city*.
 You walk the album from track 1 to 12; each song is its own **world** themed to its
-meaning, the album plays as you move between worlds, **police/news helicopters** patrol
-overhead, **lowriders bounce** in classic hydraulic styles, and **easter eggs from
-Kendrick's whole career** (Section.80 → GNX → Super Bowl LIX) are scattered to find.
+meaning, the **sky, sun and clouds shift** with every track, a **mood-matched score plays**
+as you move between worlds, **police/news helicopters** patrol overhead, **lowriders bounce**
+in classic hydraulic styles, and **easter eggs from Kendrick's whole career**
+(Section.80 → GNX → Super Bowl LIX) are scattered to find.
 
 The entire experience is **generated procedurally from C#** — there are no fragile scene
 or prefab files to break. Open the folder in Unity and press **Play**.
@@ -32,8 +33,9 @@ or prefab files to break. Open the folder in Unity and press **Play**.
 
 ## The twelve worlds
 
-As you cross into each world the **fog, ambient light, sky colour and sun** morph to match
-the track, and the audio cross-fades.
+As you cross into each world the **procedural sky, drifting clouds, fog, ambient light and sun**
+morph to match the track, and the score cross-fades. The walls are kept low so the changing
+sky is always overhead.
 
 1. **Sherane…** — dusk Compton street, a parked car, a porch light, hooded figures (the trap)
 2. **Bitch, Don't Kill My Vibe** — smoke and drifting candles, the calm before the storm
@@ -58,17 +60,20 @@ Section.80 *HiiiPoWeR* · *untitled unmastered.* · DAMN. **Pulitzer Prize** · 
 
 ---
 
-## Audio (YouTube)
+## Audio
 
-The tour runs with or without sound. Per track it tries, in order:
-1. a local file `Assets/StreamingAssets/Audio/NN.ogg` (most reliable — see that folder's README),
+**There is always sound.** Per track the manager resolves, in order:
+1. a local file `Assets/StreamingAssets/Audio/NN.ogg` — the real song, if you supply it
+   (most reliable; see that folder's README),
 2. an optional stream-resolver URL you configure,
-3. otherwise it shows the track's **YouTube link** on screen and plays on silently.
+3. otherwise a **procedural score synthesised at runtime** — a mood-matched chord pad and soft
+   beat tuned to each track's key and tempo, so the tour is never silent and ships with zero
+   audio files. The HUD tells you which one you're hearing.
 
-YouTube has no direct audio URL for a watch page, so either download the audio to `NN.ogg`
-(e.g. `yt-dlp -x --audio-format vorbis`) or point `gkmc_tracks.json` at a resolver. Full details
-in `Assets/StreamingAssets/Audio/README.txt`. Copy `gkmc_tracks.sample.json` →
-`gkmc_tracks.json` to set links/ids/files without recompiling.
+The album itself is copyrighted, so it isn't bundled. To hear the actual songs, download each
+track's audio to `NN.ogg` (e.g. `yt-dlp -x --audio-format vorbis`) or point `gkmc_tracks.json`
+at a resolver — full details in `Assets/StreamingAssets/Audio/README.txt`. Copy
+`gkmc_tracks.sample.json` → `gkmc_tracks.json` to set links/ids/files without recompiling.
 
 ---
 
@@ -115,8 +120,8 @@ tools/       meshy_models.json (catalogue), meshy_generate.py (generator)
 
 ## Troubleshooting
 - **Nothing happens on Play** — confirm one `GKMC_Experience` object exists (auto-boot makes one) and check the Console.
-- **No audio** — expected until you add `Audio/NN.ogg` files or a resolver (visuals are unaffected).
-- **Models don't appear** — primitives are the fallback; for GLB confirm glTFast + the `GKMC_GLTFAST` define, and that files sit in `Assets/StreamingAssets/Models/`.
+- **Audio** — a procedural score always plays; drop `Audio/NN.ogg` files (or set a resolver) to hear the real album instead.
+- **Models don't appear** — textured GLB props are an optional upgrade. By default every prop renders as a procedural primitive; to load the bundled `.glb` files install `com.unity.cloud.gltfast` and run **GKMC ▸ Enable glTFast (GKMC_GLTFAST)**, with files in `Assets/StreamingAssets/Models/`.
 - **Text missing** — uses Unity's built-in `LegacyRuntime.ttf`; present in Unity 6.
 
 ---

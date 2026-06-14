@@ -37,9 +37,9 @@ namespace GKMC
             GKMCUtil.Box(root, "Cap_Start", new Vector3(0f, WH * 0.5f, startZ), new Vector3(WW + 2f, WH, 1f), wallMat);
             GKMCUtil.Box(root, "Cap_End", new Vector3(0f, WH * 0.5f, endZ), new Vector3(WW + 2f, WH, 1f), wallMat);
 
-            GKMCUtil.Sign(root, "AlbumTitle", new Vector3(0f, 6.5f, startZ + 0.6f),
+            GKMCUtil.Sign(root, "AlbumTitle", new Vector3(0f, 4.6f, startZ + 0.6f),
                 AlbumData.Album + "\n" + AlbumData.Artist + "\n— a walkable tour —",
-                new Color(1f, 0.85f, 0.4f), 0.9f, Vector3.zero);
+                new Color(1f, 0.85f, 0.4f), 0.8f, Vector3.zero);
         }
 
         static void BuildWorld(TrackInfo ti, Transform root)
@@ -58,12 +58,18 @@ namespace GKMC
             if (ti.number > 1)
                 Gateway(w, new Vector3(0f, 0f, -HalfL), accentMat);
 
-            float zEntry = -HalfL + 5f;
-            GKMCUtil.Box(w, "Pedestal", new Vector3(0f, 0.6f, zEntry), new Vector3(5f, 1.2f, 0.6f), wallMat);
-            GKMCUtil.Sign(w, "TrackNum", new Vector3(0f, 2.6f, zEntry + 0.4f), $"{ti.number:00}", ti.accent, 1.4f);
+            // World marker — a roadside sign set on the left verge, clear of the centre path the
+            // player walks in on. (The old version put a solid pedestal dead-centre as an obstacle.)
+            float zEntry = -HalfL + 6f;
+            float mx = -HalfW + 3.5f;
             string title = ti.title + (string.IsNullOrEmpty(ti.feature) ? "" : "\n" + ti.feature);
-            GKMCUtil.Sign(w, "TrackTitle", new Vector3(0f, 1.4f, zEntry + 0.4f), title, Color.white, 0.42f);
-            GKMCUtil.Sign(w, "ThemeChip", new Vector3(0f, 0.55f, zEntry + 0.4f), "[ " + ti.theme + " ]", ti.accent, 0.34f);
+            GKMCUtil.Cyl(w, "MarkerPostL", new Vector3(mx - 2f, 1.4f, zEntry), new Vector3(0.18f, 1.4f, 0.18f), wallMat);
+            GKMCUtil.Cyl(w, "MarkerPostR", new Vector3(mx + 2f, 1.4f, zEntry), new Vector3(0.18f, 1.4f, 0.18f), wallMat);
+            GKMCUtil.Box(w, "MarkerBoard", new Vector3(mx, 3.3f, zEntry), new Vector3(5f, 2.6f, 0.18f),
+                GKMCUtil.Mat(GKMCUtil.Dark(ti.secondary, 0.9f)));
+            GKMCUtil.Sign(w, "TrackNum", new Vector3(mx, 4.1f, zEntry - 0.12f), $"{ti.number:00}", ti.accent, 0.7f);
+            GKMCUtil.Sign(w, "TrackTitle", new Vector3(mx, 3.25f, zEntry - 0.12f), title, Color.white, 0.3f);
+            GKMCUtil.Sign(w, "ThemeChip", new Vector3(mx, 2.5f, zEntry - 0.12f), "[ " + ti.theme + " ]", ti.accent, 0.26f);
 
             WorldTrigger.Create(w, ti.number, new Vector3(0f, WH * 0.5f, 0f), new Vector3(WW, WH, WL));
 

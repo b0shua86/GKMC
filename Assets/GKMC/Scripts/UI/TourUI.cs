@@ -12,6 +12,9 @@ namespace GKMC
         RawImage _panelBg;
         GameObject _panel;
         float _bannerTimer;
+        float _blurbTimer;
+        const float BlurbHold = 7f;   // seconds the world blurb stays fully visible
+        const float BlurbFade = 1.5f; // seconds it then takes to fade out of the way
 
         public static TourUI Create(Transform parent)
         {
@@ -88,25 +91,28 @@ namespace GKMC
 
         // -------------------------------------------------------------------
 
-        public void ShowWorld(TrackInfo ti, bool audioLoaded)
-        {
-            SetNowPlaying(ti, audioLoaded);
-            _bannerText.text = $"{ti.number:00}.  {ti.title}";
-            _bannerTimer = 3.2f;
-        }
-
-        public void SetNowPlaying(TrackInfo ti, bool audioLoaded)
+        public void ShowWorld(TrackInfo ti, bool audioLoaded, bool procedural)
         {
             string feat = string.IsNullOrEmpty(ti.feature) ? "" : "  " + ti.feature;
             _trackText.text = $"<b>{ti.number:00}.  {ti.title}</b>{feat}\n<color=#FFD24B>[ {ti.theme} ]</color>";
             _trackText.supportRichText = true;
             _blurbText.text = ti.worldDesc;
+            _blurbTimer = BlurbHold;   // show the blurb, then let it fade so it never blocks the view
 
-            if (audioLoaded)
-                _audioText.text = "♪ Now playing from the album";
+            RefreshAudioStatus(ti, audioLoaded, procedural);
+
+            _bannerText.text = $"{ti.number:00}.  {ti.title}";
+            _bannerTimer = 3.2f;
+        }
+
+        public void RefreshAudioStatus(TrackInfo ti, bool audioLoaded, bool procedural)
+        {
+            if (!audioLoaded)
+                _audioText.text = "♪ No audio — drop StreamingAssets/Audio/" + ti.audioFile;
+            else if (procedural)
+                _audioText.text = "♪ Procedural score · drop Audio/" + ti.audioFile + " for the real track";
             else
-                _audioText.text = "♪ No audio yet — open on YouTube:\n" + ti.youtubeUrl +
-                                  "\n(or drop StreamingAssets/Audio/" + ti.audioFile + ")";
+                _audioText.text = "♪ Now playing from the album";
         }
 
         public void SetEasterEggPrompt(EasterEgg egg)
@@ -130,6 +136,11 @@ namespace GKMC
             {
                 _bannerTimer -= Time.deltaTime;
                 SetAlpha(_bannerText, Mathf.Clamp01(_bannerTimer));
+            }
+            if (_blurbTimer > 0f)
+            {
+                _blurbTimer -= Time.deltaTime;
+                SetAlpha(_blurbText, Mathf.Clamp01(_blurbTimer / BlurbFade));
             }
         }
 

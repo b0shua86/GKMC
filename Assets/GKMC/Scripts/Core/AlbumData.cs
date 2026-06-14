@@ -35,7 +35,7 @@ namespace GKMC
 
         public const float WorldLength = 52f;  // depth of each world along +Z
         public const float WorldWidth  = 34f;  // playable width
-        public const float WallHeight  = 14f;
+        public const float WallHeight  = 7f;   // low enough to see the sky/clouds over the verge
 
         static Color H(string hex)
         {
