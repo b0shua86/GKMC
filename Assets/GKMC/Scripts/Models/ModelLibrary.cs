@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 #if GKMC_GLTFAST
 using System.Threading.Tasks;
 using GLTFast;
@@ -65,6 +66,7 @@ namespace GKMC
                 var inst = Object.Instantiate(prefab, anchor);
                 inst.transform.localPosition = Vector3.zero;
                 inst.transform.localRotation = Quaternion.identity;
+                PrepareImportedModel(inst.transform, key);
                 Fit(inst.transform, MeshyModels.Get(key));
                 DestroyAll(fallbackChildren);
                 _loaded++;
@@ -97,7 +99,7 @@ namespace GKMC
                 bool inst = await import.InstantiateMainSceneAsync(holder.transform);
                 if (!inst || anchor == null) { if (holder != null) Object.Destroy(holder); _fallbacks++; return; }
 
-                TameMaterials(holder.transform);
+                PrepareImportedModel(holder.transform, key);
                 Fit(holder.transform, MeshyModels.Get(key));
                 DestroyAll(fallbackChildren);
                 _loaded++;
@@ -134,25 +136,112 @@ namespace GKMC
         }
 
         /// <summary>
-        /// Meshy GLBs are authored fully metallic (metallicFactor/roughnessFactor = 1). In the
-        /// Built-in render pipeline a fully-metallic surface shows no diffuse colour — it just
-        /// mirrors the bright sky and reads as flat white, hiding the texture. glTFast's shaders
-        /// are forks of Unity Standard, so turning metallic down to 0 (and ignoring the
-        /// metallic-roughness map) makes the base-colour texture show as albedo again.
+        /// Meshy imports often arrive as washed-out white/metallic materials in Unity's Built-in
+        /// pipeline. This pass fixes both GLB and prefab imports: keep real textures when they exist,
+        /// but tint textureless-white materials by prop type, lower metallic, keep moderate roughness,
+        /// and ensure the renderers cast/receive shadows.
         /// </summary>
-        static void TameMaterials(Transform root)
+        static void PrepareImportedModel(Transform root, string key)
         {
+            Color fallbackTint = ModelTint(key);
+
             foreach (var r in root.GetComponentsInChildren<Renderer>(true))
             {
-                var mats = r.sharedMaterials;
+                r.shadowCastingMode = ShadowCastingMode.On;
+                r.receiveShadows = true;
+
+                // Use material instances so runtime fixes do not permanently dirty imported assets.
+                var mats = r.materials;
                 for (int i = 0; i < mats.Length; i++)
                 {
                     var m = mats[i];
-                    if (m == null || m.shader == null || !m.shader.name.StartsWith("glTF/")) continue;
+                    if (m == null) continue;
+
+                    bool hasTexture = HasAnyBaseTexture(m);
+                    bool looksWhite = LooksWhite(GetMaterialColor(m));
+                    Color target = hasTexture ? Color.white : fallbackTint;
+
+                    if (!hasTexture && looksWhite)
+                        SetMaterialColor(m, target);
+                    else if (!hasTexture && key.StartsWith("ee_"))
+                        SetMaterialColor(m, Color.Lerp(GetMaterialColor(m), fallbackTint, 0.45f));
+
+                    // Make Meshy assets readable in Built-in even when they import too metallic/glossy.
+                    if (m.HasProperty("_Metallic")) m.SetFloat("_Metallic", 0f);
                     if (m.HasProperty("metallicFactor")) m.SetFloat("metallicFactor", 0f);
-                    if (m.HasProperty("roughnessFactor")) m.SetFloat("roughnessFactor", 0.55f);
-                    m.DisableKeyword("_METALLICGLOSSMAP"); // use the scalar factors, not the metal map
+                    if (m.HasProperty("_Glossiness")) m.SetFloat("_Glossiness", 0.38f);
+                    if (m.HasProperty("_Smoothness")) m.SetFloat("_Smoothness", 0.38f);
+                    if (m.HasProperty("roughnessFactor")) m.SetFloat("roughnessFactor", 0.62f);
+
+                    m.DisableKeyword("_METALLICGLOSSMAP");
+                    m.DisableKeyword("_SPECGLOSSMAP");
+                    if (m.HasProperty("_EmissionColor"))
+                    {
+                        Color c = hasTexture ? Color.black : fallbackTint * 0.08f;
+                        m.SetColor("_EmissionColor", c);
+                    }
                 }
+                r.materials = mats;
+            }
+        }
+
+        static bool HasAnyBaseTexture(Material m)
+        {
+            if (m.HasProperty("_MainTex") && m.GetTexture("_MainTex") != null) return true;
+            if (m.HasProperty("_BaseMap") && m.GetTexture("_BaseMap") != null) return true;
+            if (m.HasProperty("baseColorTexture") && m.GetTexture("baseColorTexture") != null) return true;
+            if (m.HasProperty("_BaseColorMap") && m.GetTexture("_BaseColorMap") != null) return true;
+            return false;
+        }
+
+        static Color GetMaterialColor(Material m)
+        {
+            if (m.HasProperty("_Color")) return m.GetColor("_Color");
+            if (m.HasProperty("_BaseColor")) return m.GetColor("_BaseColor");
+            if (m.HasProperty("baseColorFactor")) return m.GetColor("baseColorFactor");
+            return Color.white;
+        }
+
+        static void SetMaterialColor(Material m, Color c)
+        {
+            if (m.HasProperty("_Color")) m.SetColor("_Color", c);
+            if (m.HasProperty("_BaseColor")) m.SetColor("_BaseColor", c);
+            if (m.HasProperty("baseColorFactor")) m.SetColor("baseColorFactor", c);
+        }
+
+        static bool LooksWhite(Color c)
+        {
+            float max = Mathf.Max(c.r, Mathf.Max(c.g, c.b));
+            float min = Mathf.Min(c.r, Mathf.Min(c.g, c.b));
+            return max > 0.72f && (max - min) < 0.16f;
+        }
+
+        static Color ModelTint(string key)
+        {
+            switch (key)
+            {
+                case "car": return new Color(0.22f, 0.26f, 0.34f);
+                case "lowrider": return new Color(0.55f, 0.18f, 0.36f);
+                case "minivan": return new Color(0.34f, 0.3f, 0.26f);
+                case "money_tree": return new Color(0.2f, 0.55f, 0.18f);
+                case "palm_tree": return new Color(0.16f, 0.38f, 0.17f);
+                case "heart": return new Color(0.75f, 0.08f, 0.16f);
+                case "fire_barrel": return new Color(0.28f, 0.16f, 0.08f);
+                case "surveillance_camera": return new Color(0.12f, 0.15f, 0.2f);
+                case "candle": return new Color(0.85f, 0.74f, 0.55f);
+                case "film_reel": return new Color(0.42f, 0.42f, 0.46f);
+                case "house": return new Color(0.35f, 0.24f, 0.18f);
+                case "city_sign": return new Color(0.18f, 0.2f, 0.25f);
+                case "helicopter_body": return new Color(0.08f, 0.1f, 0.12f);
+                case "ee_butterfly": return new Color(0.22f, 0.52f, 0.85f);
+                case "ee_crown_of_thorns": return new Color(0.74f, 0.58f, 0.25f);
+                case "ee_pulitzer": return new Color(0.9f, 0.72f, 0.28f);
+                case "ee_panther": return new Color(0.025f, 0.025f, 0.03f);
+                case "ee_gnx": return new Color(0.18f, 0.2f, 0.24f);
+                case "ee_hiiipower": return new Color(0.72f, 0.2f, 0.08f);
+                case "ee_uncle_sam": return new Color(0.28f, 0.28f, 0.34f);
+                case "ee_pglang": return new Color(0.8f, 0.78f, 0.68f);
+                default: return new Color(0.42f, 0.38f, 0.32f);
             }
         }
     }
