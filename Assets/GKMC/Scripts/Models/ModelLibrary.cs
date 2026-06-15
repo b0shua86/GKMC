@@ -1,19 +1,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
-#if GKMC_GLTFAST
-using System.Threading.Tasks;
 using GLTFast;
-#endif
 
 namespace GKMC
 {
     /// <summary>
     /// Spawns a prop and, where a Meshy-generated model is available, swaps the procedural
     /// fallback for the real model. Resolution order per key:
-    ///   1) Resources/GKMC_Models/&lt;key&gt;  (any natively-imported FBX/OBJ/prefab — no package needed)
-    ///   2) StreamingAssets/Models/&lt;key&gt;.glb via glTFast  (textured GLB; needs com.unity.cloud.gltfast
-    ///      and the GKMC_GLTFAST scripting-define symbol)
+    ///   1) Resources/GKMC_Models/&lt;key&gt;  (any natively-imported FBX/OBJ/prefab)
+    ///   2) StreamingAssets/Models/&lt;key&gt;.glb via glTFast
     ///   3) the procedural fallback that is always built first, so the world is never empty.
     /// </summary>
     public static class ModelLibrary
@@ -59,7 +55,7 @@ namespace GKMC
 
         static void TryUpgrade(string key, Transform anchor, List<Transform> fallbackChildren)
         {
-            // 1) Resources (works with zero extra packages).
+            // 1) Resources (works with prefabs/FBX/OBJ imported by Unity).
             var prefab = Resources.Load<GameObject>("GKMC_Models/" + key);
             if (prefab != null)
             {
@@ -73,16 +69,11 @@ namespace GKMC
                 return;
             }
 
-#if GKMC_GLTFAST
-            // 2) GLB via glTFast.
+            // 2) GLB via glTFast. The package is already in Packages/manifest.json, so do not require
+            // a separate scripting define just to make StreamingAssets models work.
             LoadGlbAsync(key, anchor, fallbackChildren);
-            return;
-#else
-            _fallbacks++;
-#endif
         }
 
-#if GKMC_GLTFAST
         static async void LoadGlbAsync(string key, Transform anchor, List<Transform> fallbackChildren)
         {
             string path = System.IO.Path.Combine(Application.streamingAssetsPath, "Models", key + ".glb");
@@ -110,7 +101,6 @@ namespace GKMC
                 _fallbacks++;
             }
         }
-#endif
 
         /// <summary>Scale the model so its largest dimension matches the catalogue size, then seat it.</summary>
         static void Fit(Transform model, ModelDef def)
