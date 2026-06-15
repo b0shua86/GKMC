@@ -44,9 +44,13 @@ namespace GKMC
             cam.tag = "MainCamera";
             cam.clearFlags = CameraClearFlags.Skybox;   // show the sky / clouds, not a flat colour
             cam.backgroundColor = Color.black;
-            cam.nearClipPlane = 0.05f;
-            cam.farClipPlane = 1600f;
+            cam.nearClipPlane = 0.04f;
+            cam.farClipPlane = 1800f;
+            cam.fieldOfView = 72f;
+            cam.allowHDR = true;
+            cam.allowMSAA = true;
             camGo.AddComponent<AudioListener>();
+            camGo.AddComponent<CinematicCameraEffects>();
 
             var pc = go.AddComponent<PlayerController>();
             pc._cc = cc;
