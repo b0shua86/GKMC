@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace GKMC
 {
@@ -71,7 +72,15 @@ namespace GKMC
             go.transform.localPosition = pos;
             go.transform.localScale = scale;
             if (euler.HasValue) go.transform.localEulerAngles = euler.Value;
-            if (mat != null) go.GetComponent<Renderer>().sharedMaterial = mat;
+
+            var renderer = go.GetComponent<Renderer>();
+            if (renderer != null)
+            {
+                if (mat != null) renderer.sharedMaterial = mat;
+                renderer.receiveShadows = true;
+                renderer.shadowCastingMode = mat != null && mat.renderQueue >= 3000 ? ShadowCastingMode.Off : ShadowCastingMode.On;
+            }
+
             if (!collider)
             {
                 var c = go.GetComponent<Collider>();
@@ -143,7 +152,12 @@ namespace GKMC
             tm.alignment = TextAlignment.Center;
             tm.color = color;
             var mr = go.GetComponent<MeshRenderer>();
-            if (UIFont != null) mr.sharedMaterial = UIFont.material;
+            if (mr != null)
+            {
+                if (UIFont != null) mr.sharedMaterial = UIFont.material;
+                mr.shadowCastingMode = ShadowCastingMode.Off;
+                mr.receiveShadows = false;
+            }
             return tm;
         }
 
@@ -203,7 +217,14 @@ namespace GKMC
             var renderer = go.GetComponent<ParticleSystemRenderer>();
             var pm = new Material(ParticleShader);
             pm.color = color;
+            if (additive)
+            {
+                pm.SetInt("_SrcBlend", (int)BlendMode.SrcAlpha);
+                pm.SetInt("_DstBlend", (int)BlendMode.One);
+            }
             renderer.material = pm;
+            renderer.shadowCastingMode = ShadowCastingMode.Off;
+            renderer.receiveShadows = false;
 
             ps.Play();
             return ps;
