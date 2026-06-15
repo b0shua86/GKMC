@@ -16,6 +16,13 @@ namespace GKMC
 
         [Tooltip("Set false to keep procedural primitives even when Meshy models are present.")]
         public bool useModels = true;
+
+        [Tooltip("Repairs imported Meshy/GLB/FBX materials that show up solid white or over-metallic.")]
+        public bool repairImportedMaterials = true;
+
+        [Tooltip("Experimental generated overlays added by the earlier graphics passes. Off by default because they can read as line clutter.")]
+        public bool enableProceduralOverlays = false;
+
         public float atmosphereLerp = 1.4f;
 
         public PlayerController Player { get; private set; }
@@ -71,10 +78,17 @@ namespace GKMC
             var worldsRoot = new GameObject("Worlds").transform;
             worldsRoot.SetParent(transform, false);
             WorldBuilder.BuildAll(_tracks, worldsRoot);
-            VisualPolish.Apply(_tracks, worldsRoot);
-            GraphicsOverhaul.Apply(_tracks, worldsRoot);
-            PremiumGraphicsPass.Apply(_tracks, worldsRoot);
-            SpectaclePass.Apply(_tracks, worldsRoot);
+
+            if (enableProceduralOverlays)
+            {
+                VisualPolish.Apply(_tracks, worldsRoot);
+                GraphicsOverhaul.Apply(_tracks, worldsRoot);
+                PremiumGraphicsPass.Apply(_tracks, worldsRoot);
+                SpectaclePass.Apply(_tracks, worldsRoot);
+            }
+
+            if (repairImportedMaterials)
+                MeshySceneMaterialRepair.Install(transform);
 
             // Sun / key directional light.
             var sunGo = new GameObject("Sun");
