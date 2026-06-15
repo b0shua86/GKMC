@@ -74,6 +74,7 @@ namespace GKMC
             VisualPolish.Apply(_tracks, worldsRoot);
             GraphicsOverhaul.Apply(_tracks, worldsRoot);
             PremiumGraphicsPass.Apply(_tracks, worldsRoot);
+            SpectaclePass.Apply(_tracks, worldsRoot);
 
             // Sun / key directional light.
             var sunGo = new GameObject("Sun");
