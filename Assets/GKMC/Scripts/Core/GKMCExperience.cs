@@ -72,6 +72,7 @@ namespace GKMC
             worldsRoot.SetParent(transform, false);
             WorldBuilder.BuildAll(_tracks, worldsRoot);
             VisualPolish.Apply(_tracks, worldsRoot);
+            GraphicsOverhaul.Apply(_tracks, worldsRoot);
 
             // Sun / key directional light.
             var sunGo = new GameObject("Sun");
