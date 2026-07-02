@@ -11,12 +11,18 @@ namespace GKMC
         public float lookSensitivity = 2.4f;
         public float jumpHeight = 1.3f;
         public float gravity = -18f;
+        public float baseFov = 72f;         // wider lens than Unity's 60° default
+        public float sprintFovBoost = 7f;   // lens pushes out while sprinting
+        public float bobAmplitude = 0.035f; // subtle head bob while walking
+        public float bobFrequency = 8.5f;
 
         CharacterController _cc;
         Camera _cam;
         float _pitch;
         float _yVel;
         bool _cursorLocked = true;
+        Vector3 _camBase;
+        float _bobPhase;
 
         public Camera Cam => _cam;
 
@@ -46,6 +52,7 @@ namespace GKMC
             cam.backgroundColor = Color.black;
             cam.nearClipPlane = 0.05f;
             cam.farClipPlane = 1600f;
+            cam.fieldOfView = 72f;
             camGo.AddComponent<AudioListener>();
 
             var pc = go.AddComponent<PlayerController>();
@@ -57,6 +64,7 @@ namespace GKMC
         void Start()
         {
             LockCursor(true);
+            _camBase = _cam.transform.localPosition;
         }
 
         void Update()
@@ -64,6 +72,26 @@ namespace GKMC
             HandleCursor();
             if (_cursorLocked) Look();
             Move();
+        }
+
+        void LateUpdate()
+        {
+            // Game-feel: subtle head bob while walking and a lens push while sprinting.
+            float move = Mathf.Clamp01(new Vector2(Input.GetAxisRaw("Horizontal"),
+                                                   Input.GetAxisRaw("Vertical")).magnitude);
+            bool moving = _cc.isGrounded && move > 0.1f;
+            bool sprint = Input.GetKey(KeyCode.LeftShift) && move > 0.1f;
+
+            if (moving) _bobPhase += Time.deltaTime * bobFrequency * (sprint ? 1.35f : 1f);
+            Vector3 bob = moving
+                ? new Vector3(Mathf.Cos(_bobPhase * 0.5f) * 0.5f, Mathf.Abs(Mathf.Sin(_bobPhase)), 0f)
+                  * (bobAmplitude * move)
+                : Vector3.zero;
+            _cam.transform.localPosition =
+                Vector3.Lerp(_cam.transform.localPosition, _camBase + bob, Time.deltaTime * 10f);
+
+            float targetFov = baseFov + (sprint ? sprintFovBoost : 0f);
+            _cam.fieldOfView = Mathf.Lerp(_cam.fieldOfView, targetFov, Time.deltaTime * 5f);
         }
 
         void HandleCursor()
