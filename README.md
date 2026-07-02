@@ -10,6 +10,12 @@ in classic hydraulic styles, and **easter eggs from Kendrick's whole career**
 The entire experience is **generated procedurally from C#** — there are no fragile scene
 or prefab files to break. Open the folder in Unity and press **Play**.
 
+The look is carried by a runtime-configured pipeline: **linear color space**, **bloom /
+ACES tonemapping / vignette / FXAA** (Post Processing v2), raised pixel-light and shadow
+quality, and a **silhouette skyline with lit windows** wrapping the whole tour so the city
+extends past the walls. Each world also signs its stretch of the walls with a neon strip
+in its accent color.
+
 ---
 
 ## Quick start
@@ -66,9 +72,13 @@ Section.80 *HiiiPoWeR* · *untitled unmastered.* · DAMN. **Pulitzer Prize** · 
 1. a local file `Assets/StreamingAssets/Audio/NN.ogg` — the real song, if you supply it
    (most reliable; see that folder's README),
 2. an optional stream-resolver URL you configure,
-3. otherwise a **procedural score synthesised at runtime** — a mood-matched chord pad and soft
-   beat tuned to each track's key and tempo, so the tour is never silent and ships with zero
-   audio files. The HUD tells you which one you're hearing.
+3. otherwise a **procedural score synthesised at runtime** — a four-chord progression
+   (minor keys walk i–VI–III–VII, major keys I–V–vi–IV) with bass and a kick/snare/hat
+   backbeat, tuned to each track's key and tempo and looped seamlessly, so the tour is
+   never silent and ships with zero audio files. The HUD tells you which one you're hearing.
+
+Have the album on disk already? `python3 tools/import_audio.py "/path/to/your/album folder" --apply`
+matches your filenames to track numbers and copies them in (they stay git-ignored).
 
 The album itself is copyrighted, so it isn't bundled. To hear the actual songs, download each
 track's audio to `NN.ogg` (e.g. `yt-dlp -x --audio-format vorbis`) or point `gkmc_tracks.json`
@@ -85,6 +95,11 @@ into `Packages/manifest.json` (`com.unity.cloud.gltfast` 6.18.0) and switched on
 `GKMC_GLTFAST` define in `Assets/csc.rsp`, so opening the project and pressing **Play** shows the
 real models. Each prop still builds its procedural primitive first and **swaps to the model** once
 it finishes loading, so the world is never empty and any prop without a `.glb` stays procedural.
+
+Each GLB is **imported once and instanced everywhere** (the 29 candles share one import's
+meshes and textures), and materials are post-processed for the Built-in pipeline: Meshy
+authors everything fully metallic, which would mirror the bright sky and read as white, so
+metalness is zeroed after load to let the painted base-color textures show.
 
 - **Prefer procedural-only?** Remove `com.unity.cloud.gltfast` from the manifest and delete
   `Assets/csc.rsp` — the code falls back automatically (no other change needed).
@@ -114,7 +129,8 @@ Never commit your key. Use one of:
 ## Project layout
 ```
 Assets/GKMC/Scripts/
-  Core/      GKMCExperience (boot+atmosphere), AlbumData, GKMCUtil
+  Core/      GKMCExperience (boot+atmosphere), AlbumData, GKMCUtil,
+             VisualQuality (quality settings + post-processing)
   Player/    PlayerController (FPS walker)
   Audio/     YouTubeAudioManager (resolve + cross-fade)
   World/     WorldBuilder, GKMCAnimators (Bobber/Spinner/LowriderHop/…),
@@ -131,6 +147,10 @@ tools/       meshy_models.json (catalogue), meshy_generate.py (generator)
 - **Audio** — a procedural score always plays; drop `Audio/NN.ogg` files (or set a resolver) to hear the real album instead.
 - **Models don't appear** — GLB loading needs `com.unity.cloud.gltfast` (in `Packages/manifest.json`) plus the `GKMC_GLTFAST` define (in `Assets/csc.rsp`); both ship enabled. If the package failed to resolve (e.g. offline on first open) every prop stays a procedural primitive. Check the Console — `ModelLibrary` logs loaded-vs-procedural counts.
 - **Text missing** — uses Unity's built-in `LegacyRuntime.ttf`; present in Unity 6.
+- **Looks flat / no glow** — post-processing needs `com.unity.postprocessing` (in
+  `Packages/manifest.json`) plus the `GKMC_POSTFX` define (in `Assets/csc.rsp`); both ship
+  enabled. Without them the tour still runs, just without bloom/tonemapping. Also confirm
+  the Console logged the one-time switch to **Linear** color space.
 
 ---
 

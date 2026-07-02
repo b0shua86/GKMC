@@ -81,16 +81,37 @@ namespace GKMC
         }
 
 #if GKMC_GLTFAST
-        static async void LoadGlbAsync(string key, Transform anchor, List<Transform> fallbackChildren)
+        // One import per GLB, shared by every instance. The tour places some props dozens of
+        // times (29 candles alone); importing per instance would duplicate every mesh and
+        // texture in memory and multiply load time, so all instances share one GltfImport.
+        static readonly Dictionary<string, Task<GltfImport>> _imports = new Dictionary<string, Task<GltfImport>>();
+
+        static Task<GltfImport> GetImportAsync(string key)
+        {
+            if (!_imports.TryGetValue(key, out var task))
+            {
+                task = ImportAsync(key);
+                _imports[key] = task;
+            }
+            return task;
+        }
+
+        static async Task<GltfImport> ImportAsync(string key)
         {
             string path = System.IO.Path.Combine(Application.streamingAssetsPath, "Models", key + ".glb");
             string uri = path.Contains("://") ? path : "file://" + path;
+            var import = new GltfImport();
+            bool ok = await import.Load(uri);
+            if (!ok) { import.Dispose(); return null; }
+            return import;
+        }
 
+        static async void LoadGlbAsync(string key, Transform anchor, List<Transform> fallbackChildren)
+        {
             try
             {
-                var import = new GltfImport();
-                bool ok = await import.Load(uri);
-                if (!ok || anchor == null) { _fallbacks++; return; }
+                var import = await GetImportAsync(key);
+                if (import == null || anchor == null) { _fallbacks++; return; }
 
                 var holder = new GameObject("model");
                 holder.transform.SetParent(anchor, false);

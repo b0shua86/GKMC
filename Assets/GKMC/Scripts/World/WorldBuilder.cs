@@ -37,6 +37,17 @@ namespace GKMC
             GKMCUtil.Box(root, "Cap_Start", new Vector3(0f, WH * 0.5f, startZ), new Vector3(WW + 2f, WH, 1f), wallMat);
             GKMCUtil.Box(root, "Cap_End", new Vector3(0f, WH * 0.5f, endZ), new Vector3(WW + 2f, WH, 1f), wallMat);
 
+            // Neon accent strip along the wall tops, coloured per world — each track signs its own
+            // stretch of the tour, and with bloom the strips read from any distance.
+            foreach (var ti in tracks)
+            {
+                var glow = GKMCUtil.MatEmissive(ti.accent, ti.accent, 1.8f);
+                GKMCUtil.Box(root, $"WallGlow_L{ti.number:00}", new Vector3(-HalfW - 0.45f, WH + 0.2f, ti.ZCenter),
+                    new Vector3(0.7f, 0.35f, WL - 3f), glow, false);
+                GKMCUtil.Box(root, $"WallGlow_R{ti.number:00}", new Vector3(HalfW + 0.45f, WH + 0.2f, ti.ZCenter),
+                    new Vector3(0.7f, 0.35f, WL - 3f), glow, false);
+            }
+
             GKMCUtil.Sign(root, "AlbumTitle", new Vector3(0f, 4.6f, startZ + 0.6f),
                 AlbumData.Album + "\n" + AlbumData.Artist + "\n— a walkable tour —",
                 new Color(1f, 0.85f, 0.4f), 0.8f, Vector3.zero);

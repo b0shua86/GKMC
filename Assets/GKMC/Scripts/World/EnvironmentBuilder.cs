@@ -74,6 +74,55 @@ namespace GKMC
             return pm;
         }
 
+        /// <summary>
+        /// Silhouette city blocks beyond the tour walls, two rows deep on each side, with sparse
+        /// lit windows. Looking over the low walls now reads as rooftops and a skyline instead of
+        /// an empty plain — the m.A.A.d city surrounds the whole walk.
+        /// </summary>
+        public static void BuildSkyline(Transform parent, float minZ, float maxZ)
+        {
+            var prev = Random.state;
+            Random.InitState(20121022);   // album release date — the same city every run
+
+            var root = new GameObject("Skyline").transform;
+            root.SetParent(parent, false);
+
+            var dark = GKMCUtil.Mat(new Color(0.035f, 0.035f, 0.045f), 0f, 0.05f);
+            var winWarm = GKMCUtil.MatEmissive(new Color(1f, 0.8f, 0.45f), new Color(1f, 0.72f, 0.38f), 1.7f);
+            var winCool = GKMCUtil.MatEmissive(new Color(0.62f, 0.78f, 1f), new Color(0.55f, 0.72f, 1f), 1.4f);
+
+            foreach (float side in new[] { -1f, 1f })
+            {
+                // Near row: low-rise blocks just past the walls.
+                for (float z = minZ - 60f; z < maxZ + 60f; z += Random.Range(11f, 19f))
+                    Building(root, side * Random.Range(27f, 40f), z,
+                        Random.Range(6f, 12f), Random.Range(4f, 10f), dark, winWarm, winCool);
+
+                // Far row: taller towers for a layered horizon.
+                for (float z = minZ - 80f; z < maxZ + 80f; z += Random.Range(16f, 27f))
+                    Building(root, side * Random.Range(50f, 85f), z,
+                        Random.Range(8f, 16f), Random.Range(9f, 22f), dark, winWarm, winCool);
+            }
+
+            Random.state = prev;
+        }
+
+        static void Building(Transform root, float x, float z, float w, float h,
+            Material dark, Material winWarm, Material winCool)
+        {
+            float d = Random.Range(6f, 12f);
+            GKMCUtil.Box(root, "Block", new Vector3(x, h * 0.5f - 0.3f, z), new Vector3(w, h, d), dark, false);
+
+            // Sparse lit windows on the face toward the tour.
+            int windows = Random.value < 0.55f ? Random.Range(1, 4) : 0;
+            float face = x > 0f ? x - w * 0.5f - 0.06f : x + w * 0.5f + 0.06f;
+            for (int i = 0; i < windows; i++)
+                GKMCUtil.Box(root, "Window",
+                    new Vector3(face, Random.Range(1.5f, h - 1f), z + Random.Range(-d * 0.35f, d * 0.35f)),
+                    new Vector3(0.1f, Random.Range(0.5f, 1f), Random.Range(0.6f, 1.4f)),
+                    Random.value < 0.7f ? winWarm : winCool, false);
+        }
+
         /// <summary>A vast ground plane so the world meets a horizon instead of empty void.</summary>
         public static void BuildGround(Transform parent, Color color)
         {

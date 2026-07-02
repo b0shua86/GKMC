@@ -90,10 +90,12 @@ namespace GKMC
             RenderSettings.sun = _sun;
             _cloudMat = EnvironmentBuilder.BuildClouds(envRoot, minZ, maxZ);
             EnvironmentBuilder.BuildGround(envRoot, new Color(0.11f, 0.11f, 0.12f));
+            EnvironmentBuilder.BuildSkyline(envRoot, minZ, maxZ);
 
             // Player at the entrance of world 1, facing down the tour.
             Player = PlayerController.Create(transform, new Vector3(0f, 1.2f, -AlbumData.WorldLength * 0.5f + 4f));
             Player.transform.localEulerAngles = new Vector3(0f, 0f, 0f);
+            VisualQuality.Apply(Player.Cam);
 
             Audio = YouTubeAudioManager.Create(transform, _tracks);
             UI = TourUI.Create(transform);
